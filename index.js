@@ -75,7 +75,7 @@ class PSClient {
         try {
         	for (let i = 0; i < this.commandList.length+1; i++) {
         	    var info = this.commandList[i].info;
-        		if (info.name == name || info.aliases.includes(name)) { throw i; }
+        		if (info.name == name || (info.aliases && info.aliases.includes(name)) ) { throw i; }
         	}
         	throw null;
         	
