@@ -2,6 +2,8 @@
 
 /* Made by nutmeg using elements of the NutFL function library.
 	  === https://github.com/TheFlameZEternal/nutfl ===
+   
+	Note: Blame any weird indents on github lol
 	
 */
 
