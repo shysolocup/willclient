@@ -213,61 +213,37 @@ class PSClient {
 	embed(obj) {
 		if (obj.color) { obj.color = obj.color.colorForm(); }
 		if (obj.author) {
-			if (obj.author.icon) {
-				obj.author.icon_url = obj.author.icon;
-			}
-			else if (obj.author.iconURL) {
-				obj.author.icon_url = obj.author.iconURL;
-			}
+			if (obj.author.icon) { obj.author.icon_url = obj.author.icon; }
+			else if (obj.author.iconURL) { obj.author.icon_url = obj.author.iconURL; }
 		}
 		if (typeof obj.thumbnail == "string") {
 			let thumbnail = obj.thumbnail;
-			obj.thumbnail = {
-				url: thumbnail
-			};
+			obj.thumbnail = { url: thumbnail };
 		}
 		if (obj.fields) {
 			let fixFields = [];
 			
 			obj.fields.forEach( (field) => {
 				fixFields.push(field);
-				if (field.newline) {
-					fixFields.push({ name:"** **", value: "** **", inline: false});
-				}
+				if (field.newline) { fixFields.push({ name:"** **", value: "** **", inline: false}); }
 			});
 
 			obj.fields = fixFields;
 		}
-
 		if (typeof obj.image == "string") {
 			let image = obj.image;
-			obj.image = {
-				url: image
-			};
+			obj.image = { url: image };
 		}
-
-		if (obj.timestamp.toLowerCase() == "current" || obj.timestamp.toLowerCase() == "now") {
-			obj.timestamp = new Date().toISOString();
-		}
-
+		if (obj.timestamp.toLowerCase() == "current" || obj.timestamp.toLowerCase() == "now") { obj.timestamp = new Date().toISOString(); }
 		if (obj.footer) {
 			if (typeof obj.footer == "string") {
 				let footer = obj.footer;
-				obj.footer = {
-					text: footer
-				};
+				obj.footer = { text: footer };
 			}
-
-			if (obj.footer.name) {
-				obj.footer.text = obj.footer.name;
-			}
-
-			if (obj.footer.icon) {
-				obj.footer.icon_url = obj.footer.icon;
-			}
-			else if (obj.footer.iconURL) {
-				obj.footer.icon_url = obj.footer.iconURL;
-			}
+			
+			if (obj.footer.name) { obj.footer.text = obj.footer.name; }
+			if (obj.footer.icon) { obj.footer.icon_url = obj.footer.icon; }
+			else if (obj.footer.iconURL) { obj.footer.icon_url = obj.footer.iconURL; }
 		}
 		
 		return obj;
@@ -276,6 +252,33 @@ class PSClient {
 	/* misc */
 	fetchUser(id) { let mention = id; if (mention.startsWith('<@') && mention.endsWith('>')) {mention = mention.slice(2, -1); if (mention.startsWith('!')) {mention = mention.slice(1); }} mention = mention.split("").join(""); let user = this.client.users.cache.get(mention); return (!user) ? null : user; }
 	
+	/* voice */
+	voice = new class {
+		mute(user) {
+			return user.setMute(true);
+		}
+		
+		unmute(user) {
+			return user.setMute(false);
+		}
+		
+		deafen(user) {
+			return user.setDeaf(true);
+		}
+		
+		deaf(user) { 
+			return this.deafen(user); 
+		}
+		
+		undeafen(user) {
+			return user.setDeaf(false);
+		}
+		undeaf(user) { 
+			return this.undeafen(user); 
+		}
+	}
+	
+	/* guild */
 	guild = new class {
 		get memberCount() {
 			var [bot, client, ctx] = Holder; return ctx.guild.memberCount;
