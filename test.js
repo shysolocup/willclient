@@ -1,3 +1,11 @@
+/* :: Discord.PS :: Version 0.2 | 01/27/23 :: */
+
+/* Made by nutmeg using elements of the NutFL function library.
+	  === https://github.com/TheFlameZEternal/nutfl ===
+	
+*/
+
+
 Array.prototype.remove = function(int) {
 	const [res, o] = [ [], this];
 	const length = o.length;
