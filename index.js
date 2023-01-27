@@ -16,7 +16,31 @@ Object.defineProperty(String.prototype, "block", {
 	get() { return "`"+this+"`" }, set(){}
 });
 
-Object.prototype.codeBlock = function(language=null) {
+Object.defineProperty(String.prototype, "italic", {
+	get() { return `*${this}*`; }, set(){}
+});
+
+Object.defineProperty(String.prototype, "bold", {
+	get() { return `**${this}**`; }, set(){}
+});
+
+Object.defineProperty(String.prototype, "underline", {
+	get() { return `__${this}__`; }, set(){}
+});
+
+Object.defineProperty(String.prototype, "linethrough", {
+	get() { return `~~${this}~~`; }, set(){}
+});
+
+Object.defineProperty(String.prototype, "bold", {
+	get() { return `**${this}**`; }, set(){}
+});
+
+Object.defineProperty(String.prototype, "spoiler", {
+	get() { return `||${this}||`; }, set(){}
+});
+
+String.prototype.codeBlock = function(language=null) {
 	return (language) ? "```"+language+"\n"+this+"```" : "```"+this+"```"
 };
 
