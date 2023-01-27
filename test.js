@@ -89,6 +89,9 @@ class PSClient {
 	};
 	
 	setCooldown(time) {
+		if (typeof time != "number") {
+			throw new CoolError("Global Cooldown", "Cooldown has to be an integer (seconds)");
+		}
 		this.globalCooldown.time = time;
 		this.globalCooldown.active = true;
 	}
