@@ -8,7 +8,7 @@ Array.prototype.remove = function(int) {
 	return res;
 };
 
-String.prototype.colorForm = function() {
+String.prototype.colorFormat = function() {
 	if (this.startsWith("#")) { var a = this.replace("#", "0x"); return parseInt(a); } else { return 0x5865F2; }
 };
 
@@ -399,7 +399,7 @@ class PSClient {
 	}
 	
 	embed(obj) {
-		if (obj.color) { obj.color = obj.color.colorForm(); }
+		if (obj.color) { obj.color = obj.color.colorFormat(); }
 		if (obj.author) {
 			if (obj.author.icon) { obj.author.icon_url = obj.author.icon; }
 			else if (obj.author.iconURL) { obj.author.icon_url = obj.author.iconURL; }
