@@ -492,11 +492,3 @@ client.guild.stickers( (stickers) => {
 	});
 });
 ```
-
-#### Client.guild.fetch() : `User`
-gets a user from a guild<br>
-takes a user's id or @mention
-```js
-let user = client.guild.fetch(user);
-console.log(user.tag);
-```
