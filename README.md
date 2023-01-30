@@ -7,7 +7,7 @@ for a full look go check out the docs [here](https://github.com/TheFlameZEternal
 ```
 npm i TheFlameZEternal/Discord.PS
 
-npm i discord.ps
+npm i discord.ps (this is not currently available)
 ```
 ## Setting Up
 #### **== Discord.JS Client ==**
