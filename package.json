@@ -3,6 +3,10 @@
     "version": "0.4.0",
     "author": "nutmeg"
     "description": "A combination of Discord.JS and Discord.PY APIs made in Node JS to solve most of the annoying parts of Discord.JS and possibly welcome Discord.PY users into Node JS.",
+    "dependencies": {
+        "discord.js": "latest",
+        "@discord/voice": "latest"
+    },
     "repository": {
         "type": "git",
         "url": "https://github.com/TheFlameZEternal/Discord.PS.git"
