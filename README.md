@@ -6,6 +6,7 @@ for a full look go check out the docs [here](https://github.com/TheFlameZEternal
 ## Installation
 ```
 npm i https://github.com/TheFlameZEternal/Discord.PS
+
 npm i discord.ps
 ```
 ## Setting Up
