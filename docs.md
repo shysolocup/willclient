@@ -105,14 +105,14 @@ console.log(client.commandList);
 ```
 ### Ugly Documentation
 
-#### Client.login() `None`
+#### Client.login() : `None`
 login with a token<br>
 takes a token as a string
 ```js
 client.login(token);
 ```
 
-#### Client.command() `Object`
+#### Client.command() : `Object`
 creates a new command
 ```js
 client.command( {name: "name", alises: ["aliases"], cooldown: 5}, async (ctx, cmd) => {
@@ -120,7 +120,7 @@ client.command( {name: "name", alises: ["aliases"], cooldown: 5}, async (ctx, cm
 });
 ```
 
-#### Client.fetchCommand() `Object`
+#### Client.fetchCommand() : `Object`
 to fetch a command you can use this<br>
 takes a command name and a function *(optional)*
 ```js
@@ -134,14 +134,14 @@ client.fetchCommand("test", (command) => {
 });
 ```
 
-#### Client.commandExists() `Boolean`
+#### Client.commandExists() : `Boolean`
 to check if a command exists you can use this<br>
 takes a command name
 ```js
 let exists = client.commandExists("test");
 ```
 
-#### Client.executeCommand() `Function`
+#### Client.executeCommand() : `Function`
 mostly used for parts of the api but you can use it if you want<br>
 used to execute commands with script instead of with messages
 ```js
@@ -158,7 +158,7 @@ console.log(format.name); // "test"
 console.log(format.args); // ["a", "b", "c"]
 ```
 
-#### Client.commandHandler() `None`
+#### Client.commandHandler() : `None`
 mostly used for parts of the api but you can use it if you want<br>
 used to handle commands from messages
 ```js
@@ -168,19 +168,19 @@ discordClient.on("messageCreate", async (ctx) => {
 });
 ```
 
-#### Client.commandList `Array`
+#### Client.commandList : `Array`
 returns an array of all the commands for the bot
 ```js
 console.log(client.commandList);
 ```
 
-#### Client.eventList `Object`
+#### Client.eventList : `Object`
 returns an array of all the events
 ```js
 console.log(client.eventList);
 ```
 
-#### Client.event() `Function`
+#### Client.event() : `Function`
 does something when an event happens
 ```js
 client.event("join", async (ctx) => {
@@ -188,7 +188,7 @@ client.event("join", async (ctx) => {
 });
 ```
 
-#### Client.colors `Object`
+#### Client.colors : `Object`
 for a full list of colors you can either go to [here](https://github.com/TheFlameZEternal/Discord.PS/blob/main/lists/colorList.txt) or do this:
 ```js
 console.log(client.colors);
@@ -200,13 +200,13 @@ let embed = client.Embed({
 });
 ```
 
-#### Client.colorFormat() `Number`
+#### Client.colorFormat() : `Number`
 converts a hex color into an 0x int color for use in embeds
 ```js
 client.colorFormat(client.colors.blurple); // 0x7289da
 ```
 
-#### Client.Embed() `Object`
+#### Client.Embed() : `Object`
 edited version of the normal message embeds for more simplicity<br>
 for all of the ones that have url removed you can still use it especially for things like footer
 ```js
@@ -237,7 +237,7 @@ let embed = client.Embed({
 client.channel.send({embeds: [embed]});
 ```
 
-#### Client.Button `Object`
+#### Client.Button() : `Object`
 edited version of the normal message buttons for way more simplicity<br>
 for more info on buttons and button styles go [here](https://discord.com/developers/docs/interactions/message-components#buttons)
 ```js
@@ -249,13 +249,13 @@ let button = client.Button({
 });
 ```
 
-#### Client.buttonStyle() `Number`
+#### Client.buttonStyle() : `Number`
 takes a string and converts it into the cooresponding number
 ```js
 console.log(client.buttonStyle("primary")); // 1
 ```
 
-#### Client.Selection() `Object`
+#### Client.Selection() : `Object`
 edited version of the normal message select menus for way more simplicity<br>
 for more info on select menus go [here](https://discord.com/developers/docs/interactions/message-components#select-menus)
 ```js
@@ -273,7 +273,7 @@ let select = client.Selection({
 });
 ```
 
-#### Client.ActionRow() `Object`
+#### Client.ActionRow() : `Object`
 takes an array and returns a new action row<br>
 used for buttons and stuff
 ```js
@@ -285,7 +285,7 @@ let row = client.ActionRow([button1, button2]);
 client.channel.send({ components: [row] });
 ```
 
-#### Client.fetchUser() `User`
+#### Client.fetchUser() : `User`
 takes an id or @mention and gets user info from the bot's user cache
 ```js
 let user = client.fetchUser("id");
@@ -293,7 +293,7 @@ let user = client.fetchUser("id");
 console.log(user.tag);
 ```
 
-#### Client.fetchGuildUser() `User`
+#### Client.fetchGuildUser() : `User`
 takes an id or @mention and gets user info from a guild's users
 ```js
 let user = client.fetchGuildUser("id");
@@ -301,7 +301,7 @@ let user = client.fetchGuildUser("id");
 console.log(user.tag);
 ```
 
-#### Client.fetchChannel() `Channel`
+#### Client.fetchChannel() : `Channel`
 takes an id or #channel mention and gets channel info from the bot's channel cache
 ```js
 let channel = client.fetchChannel("id");
@@ -309,7 +309,7 @@ let channel = client.fetchChannel("id");
 console.log(channel.name);
 ```
 
-#### Client.fetchGuildChannel() `Channel`
+#### Client.fetchGuildChannel() : `Channel`
 takes an id or #channel mention and gets channel info from a guild's channels
 ```js
 let channel = client.fetchGuildChannel("id");
@@ -317,7 +317,7 @@ let channel = client.fetchGuildChannel("id");
 console.log(channel.name);
 ```
 
-#### Client.fetchGuildRole() `Role`
+#### Client.fetchGuildRole() : `Role`
 takes an id or @role mention and gets role info from a guild's roles
 ```js
 let role = client.fetchGuildRole("id");
@@ -325,7 +325,7 @@ let role = client.fetchGuildRole("id");
 console.log(role.name);
 ```
 
-#### Client.time `String`
+#### Client.time : `String`
 outputs a string with a timestamp that can be used by discord
 for more info on how timestamps work go [here](https://gist.github.com/LeviSnoot/d9147767abeef2f770e9ddcd91eb85aa)<br>
 ```js
@@ -350,100 +350,100 @@ client.channel.send(client.time.now.relative, {embeds: [embed]});
 - longDT: longer version of the date and time
 - relative: time relative to the current time
 
-#### Client.channel.send() `CTX`
+#### Client.channel.send() : `CTX`
 sends a message to a channel<br>
 takes message content and an extras object
 ```js
 let message = await client.channel.send("abc", {embeds: [embed], components: [row]});
 ```
 
-#### Client.reply() `CTX`
+#### Client.reply() : `CTX`
 replies to a message<br>
 takes message content and an extras object
 ```js
 let message = await client.reply("abc", {embeds: [embed], components: [row]});
 ```
 
-#### Client.channel.purge() `None`
+#### Client.channel.purge() : `None`
 purges a channel for a given amount of messages<br>
 channel is optional and defaults to the ctx channel if not given
 ```js
 client.channel.purge(5, channel);
 ```
 
-#### Client.channel.lock() `None`
+#### Client.channel.lock() : `None`
 locks a channel making it so the @everyone role can't speak<br>
 channel is optional and defaults to the ctx channel if not given
 ```js
 client.channel.lock(channel);
 ```
 
-#### Client.channel.unlock() `None`
+#### Client.channel.unlock() : `None`
 unlocks a channel making it so the @everyone role can speak again<br>
 channel is optional and defaults to the ctx channel if not given
 ```js
 client.channel.unlock(channel);
 ```
 
-#### Client.voice.lock() `None`
+#### Client.voice.lock() : `None`
 mutes and deafens everyone in a voice channel<br>
 takes a channel
 ```js
 client.voice.lock(channel)
 ```
 
-#### Client.voice.unlock() `None`
+#### Client.voice.unlock() : `None`
 unmutes and undeafens everyone in a voice channel<br>
 takes a channel
 ```js
 client.voice.unlock(channel)
 ```
 
-#### Client.voice.join(channel) `None`
+#### Client.voice.join(channel) : `None`
 makes the bot join a voice channel<br>
 takes a channel
 ```js
 client.voice.join(channel)
 ```
 
-#### Client.voice.leave(channel) `None`
+#### Client.voice.leave(channel) : `None`
 makes the bot leave a voice channel<br>
 takes a channel
 ```js
 client.voice.leave(channel)
 ```
 
-#### Client.guild.memberCount `Number`
+#### Client.guild.memberCount : `Number`
 returns the amount of members a guild has
 ```js
 client.guild.memberCount
 ```
 
-#### Client.guild.roleCount `Number`
+#### Client.guild.roleCount : `Number`
 returns the amount of roles a guild has
 ```js
 client.guild.roleCount
 ```
 
-#### Client.guild.channelCount `Number`
+#### Client.guild.channelCount : `Number`
 returns the amount of channels a guild has
 ```js
 client.guild.channelCount
 ```
 
-#### Client.guild.emojiCount `Number`
+#### Client.guild.emojiCount : `Number`
 returns the amount of emojis a guild has
 ```js
 client.guild.emojisCount
 ```
 
-#### Client.guild.stickerCount `Number`
+#### Client.guild.stickerCount : `Number`
 returns the amount of stickers a guild has
 ```js
 client.guild.stickerCount
 ```
 
-#### Client.guild.members() `Function`
+#### Client.guild.members() : `Function`
 lets you get every member in a server
 ```js
 client.guild.members( (members) => {
@@ -453,7 +453,7 @@ client.guild.members( (members) => {
 });
 ```
 
-#### Client.guild.roles() `Function`
+#### Client.guild.roles() : `Function`
 lets you get every role in a server
 ```js
 client.guild.roles( (roles) => {
@@ -463,7 +463,7 @@ client.guild.roles( (roles) => {
 });
 ```
 
-#### Client.guild.channels() `Function`
+#### Client.guild.channels() : `Function`
 lets you get every channel in a server
 ```js
 client.guild.channels( (channels) => {
@@ -473,7 +473,7 @@ client.guild.channels( (channels) => {
 });
 ```
 
-#### Client.guild.emojis() `Function`
+#### Client.guild.emojis() : `Function`
 lets you get every emoji in a server
 ```js
 client.guild.emojis( (emojis) => {
@@ -483,7 +483,7 @@ client.guild.emojis( (emojis) => {
 });
 ```
 
-#### Client.guild.stickers() `Function`
+#### Client.guild.stickers() : `Function`
 lets you get every sticker in a server
 ```js
 client.guild.stickers( (stickers) => {
@@ -491,4 +491,12 @@ client.guild.stickers( (stickers) => {
 		// do stuff
 	});
 });
+```
+
+#### Client.guild.fetch() : `User`
+gets a user from a guild<br>
+takes a user's id or @mention
+```js
+let user = client.guild.fetch(user);
+console.log(user.tag);
 ```
