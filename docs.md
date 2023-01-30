@@ -22,7 +22,7 @@ once you have your ps client set up and working you can run it using this:
 ```js
 client.login(token);
 ```
-## Basics
+### Events
 Discord.PS is a combination of Discord.JS and Discord.PY so both work for the most part.
 ```js
 // Discord.JS
@@ -36,7 +36,6 @@ client.event("ready", (ctx) => {
 	console.log(`Logged in as ${ctx.user.tag}.`);
 });
 ```
-### Events
 as shown before events function similar to the already existing client.on() from Discord.JS<br>
 Discord.PS expands mostly on event names as there are a lot more names for events<br><br>
 
