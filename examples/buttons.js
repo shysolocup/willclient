@@ -31,4 +31,17 @@ client.command( {name: "buttons"}, async (ctx, cmd) => {
     client.reply("Choose wisely..", { components: [row]});
 });
 
+client.event("interaction", async (ctx) => {
+    if (ctx.isButton()) {
+        let id = ctx.customId;
+        
+        if (id == "true") {
+            return ctx.reply("You clicked true!");
+        }
+        if (id == "false") {
+            return ctx.reply("You clicked false!");
+        }
+    }
+});
+
 client.login(config.token);
