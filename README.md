@@ -4,8 +4,8 @@ Discord.PS is a combination of Discord.JS and Discord.PY APIs made in Node JS to
 for a look at some examples check out the examples folder [here](https://github.com/TheFlameZEternal/Discord.PS/tree/main/examples)<br>
 for a full look go check out the docs [here](https://github.com/TheFlameZEternal/Discord.PS/blob/main/docs.md)
 ## Installation
-*__NOTE: AS OF RIGHT NOW IT'S NOT AVAILABLE ON NPM SO YOU'LL HAVE TO DOWNLOAD AND USE IT LOCALLY USING THE [INDEX.JS](https://github.com/TheFlameZEternal/Discord.PS/blob/main/index.js) FILE__*
 ```
+npm i https://github.com/TheFlameZEternal/Discord.PS
 npm i discord.ps
 ```
 ## Setting Up
