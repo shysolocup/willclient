@@ -48,7 +48,11 @@ same as events all Discord.JS commands will still function the same even if you 
 ```js
 // Discord.JS
 client.on("messageCreate", async (ctx) => {
-	console.log(ctx.content);
+	if (this.prefix && (!ctx.content.startsWith(this.prefix) || ctx.content.endsWith(this.prefix) && ctx.content.startsWith(this.prefix))) return;
+	
+	if (ctx.content == `${prefix}test`) {
+		console.log(ctx.content);
+	}
 });
 ```
 however, Discord.PS has an entirely different command system that's similar to Discord.PY<br>
