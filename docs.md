@@ -90,6 +90,15 @@ client.command( {name: "test", aliases: ["testcommand", "commandtest"], cooldown
 	console.log(cmd.cooldown); // null
 });
 ```
+#### **== Cooldown Handling ==**
+*unfortunately due to JavaScript limitations I wasn't really able to add a real countdown until when the cooldown is up*
+```js
+client.command( {name: "test", cooldown: 5 }, async (ctx, cmd) => {
+	if (cmd.onCooldown) {
+		return client.reply("command is on cooldown!");
+	}
+});
+```
 if you want a full list of the bot's commands you can do this:
 ```js
 console.log(client.commandList);
