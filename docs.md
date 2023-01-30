@@ -75,7 +75,6 @@ Command Function:
 Command Info (CMD):
 - **cmd.name**: name of the command `String`
 - **cmd.args**: array of the command's arguments `Array`
-- **cmd.onCooldown**: if the command is on cooldown or not `Boolean`
 
 ```js
 // message: !test a b c
@@ -83,7 +82,6 @@ client.command( {name: "test", aliases: ["testcommand", "commandtest"], cooldown
 	console.log(ctx.content); // "!test a b c"
 	console.log(cmd.name); // "test"
 	console.log(cmd.args); // ["a", "b", "c"]
-	console.log(cmd.onCooldown); // false
 });
 ```
 if you want a full list of the bot's commands you can do this:
