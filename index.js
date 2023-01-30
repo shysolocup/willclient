@@ -641,11 +641,6 @@ class PSClient {
 			var [bot, client, ctx] = Holder;
 			ctx.guild.stickers.fetch().then(stickers => FuckPromises(stickers, func));
 		}
-		
-		fetch(user) {
-			var [bot, client, ctx] = Holder;
-			return bot.fetchGuildUser(user);
-		}
 	}
 
 	reply(content, extras=null) {
