@@ -1,6 +1,6 @@
 # Discord.PS
 Discord.PS is a combination of Discord.JS and Discord.PY APIs made in Node JS made to solve most of the annoying parts of Discord.JS and possibly welcome Discord.PY users into Node JS.<br><br>
-for a a full look go check out the docs [here](https://github.com/TheFlameZEternal/Discord.PS/blob/main/docs.md)
+for a full look go check out the docs [here](https://github.com/TheFlameZEternal/Discord.PS/blob/main/docs.md)
 ## Installation
 ```npm
 npm i discord.ps
