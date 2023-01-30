@@ -228,13 +228,14 @@ class PSClient {
 			this.globalCooldown.handle();
     	}
 		else {
+			cooldown = null;
 			onCooldown = false;
 			cooldownType = null;
 		}
     	
-    	cmd.onCooldown = onCooldown;
-		cmd.cooldownType = cooldownType;
-		cmd.cooldown = cooldown;
+    	cmd.onCooldown = (onCooldown) ? onCooldown : false;
+		cmd.cooldownType = (cooldownType) ? cooldownType : null;
+		cmd.cooldown = (cooldown) ? cooldown : null;
     	
     	return command.data(ctx, cmd);
     }
