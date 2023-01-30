@@ -21,4 +21,20 @@ client.command( {name: "purge"}, async (ctx, cmd) => {
     client.reply(`Purged ${amount} messages!`);
 });
 
+client.command( {name: "lock", aliases: ["lockdown"]}, async (ctx, cmd) => {
+    let channel = (cmd.args.length > 0) ? client.fetchChannel(cmd.args[0]) : ctx.channel;
+    
+    client.channel.lock(channel);
+    
+    client.reply(`Locked ${channel.name}!`);
+});
+
+client.command( {name: "unlock", aliases: ["unlockdown"]}, async (ctx, cmd) => {
+    let channel = (cmd.args.length > 0) ? client.fetchChannel(cmd.args[0]) : ctx.channel;
+    
+    client.channel.unlock(channel);
+    
+    client.reply(`Unlocked ${channel.name}!`);
+});
+
 client.login(config.token);
