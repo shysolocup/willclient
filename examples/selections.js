@@ -13,8 +13,44 @@ client.event("ready", (ctx) => {
 
 /* commands */
 
-client.command( {name: "select"}, async (ctx, cmd) => {
-    return client.reply("Pong!");
+client.command( {name: "selections"}, async (ctx, cmd) => {
+    let select = client.Selection({
+        id: "question",
+        placeholder: "Choose wisely..",
+        min: 1,
+        max: 1,
+        options: [
+            { label: "A", value: "a", description: "Option A" },
+            { label: "B", value: "b", description: "Option B" },
+            { label: "C", value: "c", description: "Option C" },
+            { label: "D", value: "d", description: "Option D" }
+        ]
+    });
+    
+    let row = client.ActionRow([select]);
+    
+    client.reply({components: [row]});
+});
+
+/* selection event */
+
+client.event("interaction", async (ctx) => {
+    if (ctx.isSelectMenu()) {
+        if (ctx.customId == "question") {
+            if (ctx.values[0] == "a") {
+                ctx.reply("You picked Option A!");
+            }
+            if (ctx.values[0] == "b") {
+                ctx.reply("You picked Option B!");
+            }
+            if (ctx.values[0] == "c") {
+                ctx.reply("You picked Option C!");
+            }
+            if (ctx.values[0] == "d") {
+                ctx.reply("You picked Option D!");
+            }
+        }
+    }
 });
 
 client.login(config.token);
