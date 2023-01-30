@@ -5,7 +5,7 @@
     "description": "A combination of Discord.JS and Discord.PY APIs made in Node JS to solve most of the annoying parts of Discord.JS and possibly welcome Discord.PY users into Node JS.",
     "dependencies": {
         "discord.js": "latest",
-        "@discord/voice": "latest"
+        "@discordjs/voice": "latest"
     },
     "repository": {
         "type": "git",
