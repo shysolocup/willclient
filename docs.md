@@ -66,7 +66,7 @@ client.command( {name: "test"}, async (ctx) => {
 Command Info:
 - **name**:  the name of the command `String`
 - **aliases**: secondary names for the command `Array`
-- **cooldown**: how long until a user can run a command (uses seconds) `Number`
+- **cooldown**: how long until a user can run a command again (uses seconds) `Number`
 
 Command Function:
 - **ctx**: command context (ctx.content)
