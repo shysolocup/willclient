@@ -31,7 +31,7 @@ client.on("ready", (ctx) => {
 });
 ```
 ```js
-// Discord.PY
+// Discord.PS
 client.event("ready", (ctx) => {
 	console.log(`Logged in as ${ctx.user.tag}.`);
 });
