@@ -31,6 +31,8 @@ client.command( {name: "buttons"}, async (ctx, cmd) => {
     client.reply("Choose wisely..", { components: [row]});
 });
 
+/* button event */
+
 client.event("interaction", async (ctx) => {
     if (ctx.isButton()) {
         let id = ctx.customId;
