@@ -38,7 +38,7 @@ client.event("ready", (ctx) => {
 ```
 Discord.PS expands mostly on event names as there are a lot more names for events<br><br>
 
-for a full list of all event names either go to [here](https://github.com/TheFlameZEternal/Discord.PS/blob/main/eventList.txt) or do this:
+for a full list of all event names either go to [here](https://github.com/TheFlameZEternal/Discord.PS/blob/main/lists/eventList.txt) or do this:
 ```js
 console.log(client.eventList);
 ```
@@ -189,7 +189,7 @@ client.event("join", async (ctx) => {
 ```
 
 #### Client.colors `Object`
-for a full list of colors you can either go to [here](https://github.com/TheFlameZEternal/Discord.PS/blob/main/colorList.txt) or do this:
+for a full list of colors you can either go to [here](https://github.com/TheFlameZEternal/Discord.PS/blob/main/lists/colorList.txt) or do this:
 ```js
 console.log(client.colors);
 ```
