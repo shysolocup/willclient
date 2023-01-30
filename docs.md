@@ -36,7 +36,6 @@ client.event("ready", (ctx) => {
 	console.log(`Logged in as ${ctx.user.tag}.`);
 });
 ```
-as shown before events function similar to the already existing client.on() from Discord.JS<br>
 Discord.PS expands mostly on event names as there are a lot more names for events<br><br>
 
 for a full list of all event names either go to [here](https://github.com/TheFlameZEternal/Discord.PS/blob/main/eventList.txt) or do this:
