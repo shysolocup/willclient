@@ -47,7 +47,7 @@ same as events all Discord.JS commands will still function the same even if you 
 ```js
 // Discord.JS
 client.on("messageCreate", async (ctx) => {
-	if (this.prefix && (!ctx.content.startsWith(this.prefix) || ctx.content.endsWith(this.prefix) && ctx.content.startsWith(this.prefix))) return;
+	if (!ctx.content.startsWith(prefix) || ctx.content.endsWith(prefix) && ctx.content.startsWith(prefix)) return;
 	
 	if (ctx.content == `${prefix}test`) {
 		console.log(ctx.content);
