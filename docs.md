@@ -258,6 +258,20 @@ console.log(client.buttonStyle("primary")); // 1
 #### Client.Selection() `Object`
 edited version of the normal message select menus for way more simplicity<br>
 for more info on select menus go [here](https://discord.com/developers/docs/interactions/message-components#select-menus)
+```js
+let select = client.Selection({
+	id: "id",
+	label: "label",
+	min: 1,
+	max: 4,
+	options: [
+		{ label: "A", value: "A", description: "Option A" },
+		{ label: "B", value: "B", description: "Option B" },
+		{ label: "C", value: "C", description: "Option C" },
+		{ label: "D", value: "D", description: "Option D" },
+	]
+});
+```
 
 #### Client.ActionRow() `Object`
 takes an array and returns a new action row<br>
