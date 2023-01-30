@@ -222,7 +222,7 @@ let embed = client.Embed({
 	
 	fields: [
 		{name: "test", value: "a b c", inline: true},
-		{name: "test2", value: "d e f", ineline: false}
+		{name: "test2", value: "d e f", inline: false}
 	],
 	
 	footer: "a"
