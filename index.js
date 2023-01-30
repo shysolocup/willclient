@@ -1,4 +1,4 @@
-/* :: Discord.PS :: Version 0.3 | 01/28/23 :: */
+/* :: Discord.PS :: Version 0.4 | 01/30/23 :: */
 
 /* Made by nutmeg using elements of the NutFL function library.
 	  === https://github.com/TheFlameZEternal/nutfl ===
@@ -589,7 +589,7 @@ class PSClient {
 			try {
 				connection.destroy();
 			} catch(err) {
-				throw new CoolError("Leaving Voice Channel", "Not in channel.");
+				throw new CoolError("Leaving Voice Channel", "Not in channel or cannot leave.");
 			}
 		}
 	}
@@ -686,9 +686,9 @@ class PSClient {
 		purge(amount, channel=null) {
 			var [bot, client, ctx] = Holder;
 			if (!channel) {
-				return ctx.channel.bulkDelete(amount);
+				ctx.channel.bulkDelete(amount);
 			} else {
-				return channel.bulkDelete(amount);
+				channel.bulkDelete(amount);
 			}
 		}
 		
