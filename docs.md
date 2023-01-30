@@ -9,7 +9,7 @@ const discordClient = new Client({
 });
 ```
 #### **== Discord.PS Client ==**
-once you have your discord.js client you can add in Discord.PS.<br>
+once you have your Discord.JS client you can add in Discord.PS.<br>
 *(prefix is optional)*
 ```js
 const { PSClient } = require('discord.ps');
