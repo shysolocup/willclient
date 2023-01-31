@@ -574,6 +574,17 @@ class PSClient {
 	
 	/* voice */
 	voice = new class {
+		find(user, func) {
+			var [bot, client, ctx] = Holder;
+			bot.guild.channels( (channels) => {
+				channels.forEach( (channel) => {
+					if (channel.members.has(user.id) && channel.type == 2) {
+						func(channel);
+					}
+				});
+			});
+		}
+		
 		mute(user) {
 			var [bot, client, ctx] = Holder;
 			bot.guild.channels( (channels) => {
