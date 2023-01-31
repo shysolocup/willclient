@@ -574,12 +574,16 @@ class PSClient {
 	
 	/* voice */
 	voice = new class {
-		mute(user, channel) {
+		mute(user) {
 			var [bot, client, ctx] = Holder;
-			let vc = client.channels.cache.get(channel.id);
-			
-			let vcUser = vc.members.get(user.id);
-			vcUser.voice.setMute(true);
+			bot.guild.channels( (channels) => {
+				channels.forEach( (channel) => {
+					if (channel.members.has(user.id) && channel.type == 2) {
+						let vcUser = channel.members.get(user.id);
+						vcUser.voice.setMute(true);
+					}
+				});
+			});
 		}
 
 		unmute(user, channel) {
