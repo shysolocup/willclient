@@ -536,7 +536,7 @@ class PSClient {
 
 	/* random */
 	random = new class {
-		int(min, max) {
+		number(min, max) {
 			return Math.floor(Math.random() * (max - min + 1) ) + min;
 		}
 
