@@ -842,7 +842,7 @@ class PSClient {
 }
 
 function ClientHandler(bot, client) {
-	console.log("Handler Enabled");
+	console.log("Commands Enabled");
 	client.on("messageCreate", async (ctx) => {
 		Holder = [bot, client, ctx];
 		bot.commandHandler(ctx);
