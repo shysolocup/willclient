@@ -385,6 +385,20 @@ channel is optional and defaults to the ctx channel if not given
 client.channel.unlock(channel);
 ```
 
+#### Client.channel.setSlowmode() : `None`
+sets the slowmode of a channel<br>
+takes a number (time) and an optional channel (defaults to ctx.channel)
+```js
+client.channel.setSlowmode(time, channel);
+```
+
+#### Client.channel.removeSlowmode() : `None`
+removes the slowmode for a channel<br>
+takes an optional channel (defaults to ctx.channel)
+```js
+client.channel.removeSlowmode(channel);
+```
+
 #### Client.voice.lock() : `None`
 mutes and deafens everyone in a voice channel<br>
 takes a channel
