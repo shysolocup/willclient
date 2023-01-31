@@ -626,11 +626,12 @@ class PSClient {
 			return Fuck();
 			async function Fuck() {
 				var [bot, client, ctx] = Holder;
-				return await bot.guild.channels( (channels) => {
+				
+				bot.guild.channels( (channels) => {
 					channels.forEach( (channel) => {
 						if (channel.members.has(user.id) && channel.type == 2) {
 							let vcUser = channel.members.get(user.id);
-							return vcUser;
+							console.log(vcUser);
 						}
 					});
 				});
