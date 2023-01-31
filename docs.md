@@ -336,10 +336,10 @@ let embed = client.Embed({
 
 client.channel.send(client.time.now.relative, {embeds: [embed]});
 ```
-##### Types:
+##### Types
 - Set: takes a given time and turns it into a usable time for discord *(ex: client.time.set.default("28 November 2018 09:01"))*<br>
 - Now: uses the current time and turns it into a usable time for discord *(ex: client.time.set.relative)*
-##### Times:
+##### Times
 - embed: time for embeds
 - default: default time
 - shortTime: shorter version of the time
