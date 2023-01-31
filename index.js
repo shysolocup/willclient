@@ -278,24 +278,33 @@ class PSClient {
 		"joinGuild": "guildMemberAdd",
 		"newMember": "guildMemberAdd",
 		"memberAdd": "guildMemberAdd",
+		"newCommand": "applicationCommandCreate",
 		"commandCreate": "applicationCommandCreate",
 		"createCommand": "applicationCommandCreate",
 		"commandDelete": "applicationCommandDelete",
 		"deleteCommand": "applicationCommandDelete",
 		"commandUpdate": "applicationCommandUpdate",
 		"updateCommand": "applicationCommandUpdate",
+		"commandEdit": "applicationCommandUpdate",
+		"editCommand": "applicationCommandUpdate",
 		"newChannel": "channelCreate",
 		"createChannel": "channelCreate",
 		"deleteChannel": "channelDelete",
 		"pin": "channelPinsUpdate",
 		"newPin": "channelPinsUpdate",
+		"pinsUpdate": "channelPinsUpdate",
+		"updatePins": "channelPinsUpdate",
 		"updateChannel": "channelUpdate",
+		"editChannel": "channelUpdate",
+		"channelEdit": "channelUpdate",
 		"chanelUpdate": "channelUpdate",
 		"debug": "debug",
 		"warn": "warn",
 		"newEmoji": "emojiCreate",
 		"deleteEmoji": "emojiDelete",
 		"updateEmoji": "emojiUpdate",
+		"editEmoji": "emojiUpdate",
+		"emojiEdit": "emojiUpdate",
 		"error": "error",
 		"ban": "guildBanAdd",
 		"unban": "guildBanRemove",
@@ -307,10 +316,15 @@ class PSClient {
 		"leave": "guildMemberRemove",
 		"leaveGuild": "guildMemberRemove",
 		"memberRemove": "guildMemberRemove",
+		"removeMember": "guildMemberRemove",
 		"memberChunk": "guildMemberChunk",
 		"updateMember": "guildMemberUpdate",
+		"editMember": "guildMemberUpdate",
+		"memberEdit": "guildMemberUpdate",
 		"memberUpdate": "guildMemberUpdate",
 		"updateGuild": "guildUpdate",
+		"editGuild": "guildUpdate",
+		"guildEdit": "guildUpdate",
 		"invite": "inviteCreate",
 		"newInvite": "inviteCreate",
 		"createInvite": "inviteCreate",
@@ -330,14 +344,22 @@ class PSClient {
 		"removeReaction": "messageReactionRemove",
 		"reactionRemove": "messageReactionRemove",
 		"updateMessage": "messageUpdate",
+		"edit": "messageUpdate",
+		"editMessage", "messageUpdate",
+		"messageEdit", "messageUpdate",
 		"updatePresence": "presenceUpdate",
+		"editPresence": "presenceUpdate",
+		"presenceEdit": "presenceUpdate",
 		"rateLimit": "rateLimit",
+		"slowmode": "rateLimit",
 		"invalidRequestWarning": "invalidRequestWarning",
 		"invalidated": "invalidated",
 		"createRole": "roleCreate",
 		"newRole": "roleCreate",
 		"deleteRole": "roleDelete",
 		"updateRole": "roleUpdate",
+		"editRole": "roleUpdate",
+		"roleEdit": "roleUpdate",
 		"newThread": "threadCreate",
 		"createThread": "threadCreate",
 		"deleteThread": "threadDelete",
@@ -345,12 +367,18 @@ class PSClient {
 		"threadMemberUpdate": "threadMemberUpdate",
 		"threadMembersUpdate": "threadMembersUpdate",
 		"updateThread": "threadUpdate",
+		"editThread": "threadUpdate",
+		"threadEdit": "threadUpdate",
 		"typing": "typingStart",
 		"updateUser": "userUpdate",
+		"editUser": "userUpdate",
+		"userEdit": "userUpdate",
 		"voiceUpdate": "voiceStateUpdate",
 		"updateVoice": "voiceStateUpdate",
 		"updateVoiceState": "voiceStateUpdate",
 		"updateWebhook": "webhookUpdate",
+		"editWebhook": "webhookUpdate",
+		"webhookEdit": "webhookUpdate",
 		"interaction": "interactionCreate",
 		"createInteraction": "interactionCreate",
 		"newInteraction": "interactionCreate",
@@ -367,27 +395,75 @@ class PSClient {
 		"updateStage": "stageInstanceUpdate",
 		"stageUpdate": "stageInstanceUpdate",
 		"updateStageInstance": "stageInstanceUpdate",
+		"editStage": "stageInstanceUpdate",
+		"stageEdit": "stageInstanceUpdate",
+		"editStageInstance": "stageInstanceUpdate",
 		"deleteStage": "stageInstanceDelete",
 		"stageDelete": "stageInstanceDelete",
 		"deleteStageInstance": "stageInstanceDelete",
 		"newSticker": "stickerCreate",
 		"createSticker": "stickerCreate",
 		"deleteSticker": "stickerDelete",
-		"updateSticker": "stickerUpdate"
+		"updateSticker": "stickerUpdate",
+		"editSticker": "stickerUpdate",
+		"stickerEdit": "stickerUpdate",
+		"button": "interactionCreate",
+		"buttonPress": "interactionCreate",
+		"buttonPressed": "interactionCreate",
+		"selection": "interactionCreate",
+		"select": "interactionCreate",
+		"selectMenu": "interactionCreate",
+		"submitSelection": "interactionCreate",
+		"submitSelectMenu": "interactionCreate",
+		"selectSubmit": "interactionCreate",
+		"selectMenuSubmit": "interactionCreate",
+		"selectionSubmit": "interactionCreate"
 	};
     
-    event(name, func=null) {
+    event(name, func) {
 		let eventName = (Object.keys(this.eventList).includes(name))
 			? this.eventList[name]
 		: (Object.values(this.eventList).includes(name))
 			? name
 		: function() { throw new CoolError("Bot Event", "Invalid event name.") }();
-
+		
 		this.client.on(eventName, (ctx) => {
+			if (eventName == "interactionCreate") {
+				if (ctx.isButton() && (name == "button" || name == "buttonPress" || name == "buttonPressed")) {
+					return func(ctx);
+				}
+				if (ctx.isSelectMenu() && (name == "selection" || name == "select" || name == "selectMenu" || name == "submitSelection" || name == "submitSelectMenu" || name == "selectSubmit" || name == "selectMenuSubmit" || name == "selectionSubmit")) {
+					return func(ctx);
+				}
+			}
 			return func(ctx);
 		});
     }
 	on(name, func=null) { return this.event(name, func); }
+	
+	buttonAction(func) {
+		this.client.on("interactionCreate", (ctx) => {
+			if (ctx.isButton()) {
+				return func(ctx);
+			}
+		});
+	}
+	
+	selectionAction(func) {
+		this.client.on("interactionCreate", (ctx) => {
+			if (ctx.isSelectMenu()) {
+				return func(ctx);
+			}
+		});
+	}
+	
+	rowAction(func) {
+		this.client.on("interactionCreate", (ctx) => {
+			if (ctx.isButton() || ctx.isSelectMenu()) {
+				return func(ctx);
+			}
+		});
+	}
 
 	/* embeds */
 	colors = {
@@ -452,7 +528,7 @@ class PSClient {
 			obj.image = { url: image };
 		}
 		if (obj.timestamp) {
-			if (obj.timestamp.toLowerCase() == "current" || obj.timestamp.toLowerCase() == "now") obj.timestamp = new Date().toISOString(); 
+			if (obj.timestamp.toLowerCase() == "current" || obj.timestamp.toLowerCase() == "now") obj.timestamp = new Date().toISOString();
 		}
 		if (obj.footer) {
 			if (typeof obj.footer == "string") {
@@ -471,9 +547,9 @@ class PSClient {
 	buttonStyle(style) {
 		return (typeof style == "number")
 			? style
-		: (style.toLowerCase() == "primary") 
+		: (style.toLowerCase() == "primary")
 			? 1
-		: (style.toLowerCase() == "secondary") 
+		: (style.toLowerCase() == "secondary")
 			? 2
 		: (style.toLowerCase() == "success")
 			? 3
