@@ -710,6 +710,15 @@ class PSClient {
 				channel.permissionOverwrites.edit(ctx.guild.roles.everyone.id, { SendMessages: true });
 			}
 		}
+		
+		setSlowmode(time, channel=null) {
+			var [bot, client, ctx] = Holder;
+			if (!channel) {
+				ctx.channel.setRateLimitPerUser(time);
+			} else {
+				channel.setRateLimitPerUser(time);
+			}
+		}
 	}
 	
     /* running */
