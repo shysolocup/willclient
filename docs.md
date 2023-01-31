@@ -432,32 +432,55 @@ takes an optional channel (defaults to ctx.channel)
 client.channel.removeSlowmode(channel);
 ```
 
+#### Client.voice.find() : `None`
+finds a user's voice channel<br>
+takes a user and a function
+```js
+client.voice.find(user, (channel) => {
+	console.log(channel.name);
+});
+```
+
 #### Client.voice.mute() : `None`
 mutes someone in a voice channel<br>
-takes a user and a channel
+only works if a user is in a voice channel
 ```js
-client.voice.mute(user, channel);
+client.voice.mute(user);
 ```
 
 #### Client.voice.unmute() : `None`
 unmutes someone in a voice channel<br>
-takes a user and a channel
+only works if a user is in a voice channel
 ```js
-client.voice.unmute(user, channel);
+client.voice.unmute(user);
 ```
 
 #### Client.voice.deafen() : `None`
 deafens someone in a voice channel<br>
-takes a user and a channel
+only works if a user is in a voice channel
 ```js
-client.voice.deafen(user, channel);
+client.voice.deafen(user);
 ```
 
 #### Client.voice.undeafen() : `None`
 undeafens someone in a voice channel<br>
-takes a user and a channel
+only works if a user is in a voice channel
 ```js
-client.voice.undeafen(user, channel);
+client.voice.undeafen(user);
+```
+
+#### Client.voice.lockUser() : `None`
+mutes and deafens someone in a voice channel<br>
+only works if a user is in a voice channel
+```js
+client.voice.lockUser(user);
+```
+
+#### Client.voice.unlockUser() : `None`
+unmutes and undeafens someone in a voice channel<br>
+only works if a user is in a voice channel
+```js
+client.voice.unlockUser(user);
 ```
 
 #### Client.voice.lock() : `None`
