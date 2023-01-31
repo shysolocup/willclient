@@ -350,6 +350,39 @@ client.channel.send(client.time.now.relative, {embeds: [embed]});
 - longDT: longer version of the date and time
 - relative: time relative to the current time
 
+#### Client.sleep() : `Promise`
+stops code for a given amount of time (seconds)
+```js
+console.log("a");
+
+client.sleep(1); // waits one second
+
+console.log("b");
+```
+
+#### Client.sleepMs() : `Promise`
+stops code for a given amount of time (milliseconds)
+```js
+console.log("a");
+
+client.sleepMs(1000); // waits one second
+
+console.log("b");
+```
+
+#### Client.random.number() : `Number`
+generates a random number<br>
+takes a minimum and a maximum
+```js
+console.log(client.random.number(1, 10)); // 6
+```
+
+#### Client.random.choice() : `Return`
+randomly selects from an array
+```js
+console.log(client.random.choice(["a", "b", "c"])); // "c"
+```
+
 #### Client.channel.send() : `CTX`
 sends a message to a channel<br>
 takes message content and an extras object
@@ -399,62 +432,90 @@ takes an optional channel (defaults to ctx.channel)
 client.channel.removeSlowmode(channel);
 ```
 
+#### Client.voice.mute() : `None`
+mutes someone in a voice channel<br>
+takes a user and a channel
+```js
+client.voice.mute(user, channel);
+```
+
+#### Client.voice.unmute() : `None`
+unmutes someone in a voice channel<br>
+takes a user and a channel
+```js
+client.voice.unmute(user, channel);
+```
+
+#### Client.voice.deafen() : `None`
+deafens someone in a voice channel<br>
+takes a user and a channel
+```js
+client.voice.deafen(user, channel);
+```
+
+#### Client.voice.undeafen() : `None`
+undeafens someone in a voice channel<br>
+takes a user and a channel
+```js
+client.voice.undeafen(user, channel);
+```
+
 #### Client.voice.lock() : `None`
 mutes and deafens everyone in a voice channel<br>
 takes a channel
 ```js
-client.voice.lock(channel)
+client.voice.lock(channel);
 ```
 
 #### Client.voice.unlock() : `None`
 unmutes and undeafens everyone in a voice channel<br>
 takes a channel
 ```js
-client.voice.unlock(channel)
+client.voice.unlock(channel);
 ```
 
 #### Client.voice.join(channel) : `None`
 makes the bot join a voice channel<br>
 takes a channel
 ```js
-client.voice.join(channel)
+client.voice.join(channel);
 ```
 
 #### Client.voice.leave(channel) : `None`
 makes the bot leave a voice channel<br>
 takes a channel
 ```js
-client.voice.leave(channel)
+client.voice.leave(channel);
 ```
 
 #### Client.guild.memberCount : `Number`
 returns the amount of members a guild has
 ```js
-client.guild.memberCount
+client.guild.memberCount;
 ```
 
 #### Client.guild.roleCount : `Number`
 returns the amount of roles a guild has
 ```js
-client.guild.roleCount
+client.guild.roleCount;
 ```
 
 #### Client.guild.channelCount : `Number`
 returns the amount of channels a guild has
 ```js
-client.guild.channelCount
+client.guild.channelCount;
 ```
 
 #### Client.guild.emojiCount : `Number`
 returns the amount of emojis a guild has
 ```js
-client.guild.emojisCount
+client.guild.emojisCount;
 ```
 
 #### Client.guild.stickerCount : `Number`
 returns the amount of stickers a guild has
 ```js
-client.guild.stickerCount
+client.guild.stickerCount;
 ```
 
 #### Client.guild.members() : `Function`
