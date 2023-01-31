@@ -1,4 +1,4 @@
-/* :: Discord.PS :: Version 0.4.1 | 01/30/23 :: */
+/* :: Discord.PS :: Version 0.4.1 | 01/31/23 :: */
 
 /* Made by nutmeg using elements of the NutFL function library.
 	  === https://github.com/TheFlameZEternal/nutfl ===
