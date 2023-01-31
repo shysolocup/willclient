@@ -624,7 +624,7 @@ class PSClient {
 
 		find(user) {
 			var [bot, client, ctx] = Holder;
-			bot.guild.channels( (channels) => {
+			return bot.guild.channels( (channels) => {
 				channels.forEach( (channel) => {
 					if (channel.members.has(user.id) && channel.type == 2) {
 						let vcUser = channel.members.get(user.id);
