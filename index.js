@@ -586,28 +586,78 @@ class PSClient {
 			});
 		}
 
-		unmute(user, channel) {
+		unmute(user) {
 			var [bot, client, ctx] = Holder;
-			let vc = client.channels.cache.get(channel.id);
-			
-			let vcUser = vc.members.get(user.id);
-			vcUser.voice.setMute(false);
+			bot.guild.channels( (channels) => {
+				channels.forEach( (channel) => {
+					if (channel.members.has(user.id) && channel.type == 2) {
+						let vcUser = channel.members.get(user.id);
+						vcUser.voice.setMute(false);
+					}
+				});
+			});
 		}
 
-		deafen(user, channel) {
+		deafen(user) {
 			var [bot, client, ctx] = Holder;
-			let vc = client.channels.cache.get(channel.id);
-			
-			let vcUser = vc.members.get(user.id);
-			vcUser.voice.setDeaf(true);
+			bot.guild.channels( (channels) => {
+				channels.forEach( (channel) => {
+					if (channel.members.has(user.id) && channel.type == 2) {
+						let vcUser = channel.members.get(user.id);
+						vcUser.voice.setDeaf(true);
+					}
+				});
+			});
 		}
 
-		undeafen(user, channel) {
+		undeafen(user) {
 			var [bot, client, ctx] = Holder;
-			let vc = client.channels.cache.get(channel.id);
-			
-			let vcUser = vc.members.get(user.id);
-			vcUser.voice.setDeaf(false);
+			bot.guild.channels( (channels) => {
+				channels.forEach( (channel) => {
+					if (channel.members.has(user.id) && channel.type == 2) {
+						let vcUser = channel.members.get(user.id);
+						vcUser.voice.setDeaf(false);
+					}
+				});
+			});
+		}
+
+		find(user) {
+			var [bot, client, ctx] = Holder;
+			bot.guild.channels( (channels) => {
+				channels.forEach( (channel) => {
+					if (channel.members.has(user.id) && channel.type == 2) {
+						let vcUser = channel.members.get(user.id);
+						return vcUser;
+					}
+				});
+			});
+		}
+
+		lockUser(user) {
+			var [bot, client, ctx] = Holder;
+			bot.guild.channels( (channels) => {
+				channels.forEach( (channel) => {
+					if (channel.members.has(user.id) && channel.type == 2) {
+						let vcUser = channel.members.get(user.id);
+						vcUser.voice.setMute(true);
+						vcUser.voice.setDeaf(true);
+					}
+				});
+			});
+		}
+
+		unlockUser(user) {
+			var [bot, client, ctx] = Holder;
+			bot.guild.channels( (channels) => {
+				channels.forEach( (channel) => {
+					if (channel.members.has(user.id) && channel.type == 2) {
+						let vcUser = channel.members.get(user.id);
+						vcUser.voice.setMute(false);
+						vcUser.voice.setDeaf(false);
+					}
+				});
+			});
 		}
 		
 		lock(channel) {
