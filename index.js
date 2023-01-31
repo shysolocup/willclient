@@ -530,6 +530,21 @@ class PSClient {
 
 	fetchGuildRole(id) { var [bot, client, ctx] = Holder; let rawRole = id; if (rawRole.startsWith('<@') && rawRole.endsWith('>')) {rawRole = rawRole.slice(2, -1); if (rawRole.startsWith('&')) {rawRole = rawRole.slice(1); }} rawRole = rawRole.split("").join(""); let role = ctx.guild.roles.fetch(rawRole); return (!role) ? null : role; }
 
+	sleep(time) { return new Promise(resolve => setTimeout(resolve, time*1000)); }
+
+	sleepMs(time) { return new Promise(resolve => setTimeout(resolve, time)); }
+
+	/* random */
+	random = new class {
+		int(min, max) {
+			return Math.floor(Math.random() * (max - min + 1) ) + min;
+		}
+
+		choice(array) {
+			return array[Math.floor(Math.random() * (Number(array.length)))];
+		}
+	}
+
 	/* time */
 	time = new class {
 		set = new class {
@@ -559,6 +574,38 @@ class PSClient {
 	
 	/* voice */
 	voice = new class {
+		mute(user, channel) {
+			var [bot, client, ctx] = Holder;
+			let vc = client.channels.cache.get(channel.id);
+			
+			let vcUser = vc.members.get(user.id);
+			vcUser.voice.setMute(true);
+		}
+
+		unmute(user, channel) {
+			var [bot, client, ctx] = Holder;
+			let vc = client.channels.cache.get(channel.id);
+			
+			let vcUser = vc.members.get(user.id);
+			vcUser.voice.setMute(false);
+		}
+
+		deafen(user, channel) {
+			var [bot, client, ctx] = Holder;
+			let vc = client.channels.cache.get(channel.id);
+			
+			let vcUser = vc.members.get(user.id);
+			vcUser.voice.setDeaf(true);
+		}
+
+		undeafen(user, channel) {
+			var [bot, client, ctx] = Holder;
+			let vc = client.channels.cache.get(channel.id);
+			
+			let vcUser = vc.members.get(user.id);
+			vcUser.voice.setDeaf(false);
+		}
+		
 		lock(channel) {
 			var [bot, client, ctx] = Holder;
 			let vc = client.channels.cache.get(channel.id);
@@ -684,6 +731,7 @@ class PSClient {
 				return message;
 			}
 		}
+		
 		purge(amount, channel=null) {
 			var [bot, client, ctx] = Holder;
 			if (!channel) {
