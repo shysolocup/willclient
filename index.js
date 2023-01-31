@@ -719,6 +719,15 @@ class PSClient {
 				channel.setRateLimitPerUser(time);
 			}
 		}
+
+		removeSlowmode(channel=null) {
+			var [bot, client, ctx] = Holder;
+			if (!channel) {
+				ctx.channel.setRateLimitPerUser(0);
+			} else {
+				channel.setRateLimitPerUser(0);
+			}
+		}
 	}
 	
     /* running */
