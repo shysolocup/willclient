@@ -188,6 +188,30 @@ client.event("join", async (ctx) => {
 });
 ```
 
+#### Client.buttonAction() : `Function`
+does something when a button is pressed
+```js
+client.buttonAction((ctx) => {
+	console.log(ctx.customId);
+});
+```
+
+#### Client.selectionAction() : `Function`
+does something when a select menu is submitted
+```js
+client.selectionAction((ctx) => {
+	console.log(ctx.customId);
+});
+```
+
+#### Client.rowAction() : `Function`
+does something when either a button is pressed or a select menu is submitted
+```js
+client.rowAction((ctx) => {
+	console.log(ctx.customId);
+});
+```
+
 #### Client.colors : `Object`
 for a full list of colors you can either go to [here](https://github.com/TheFlameZEternal/Discord.PS/blob/main/lists/colorList.txt) or do this:
 ```js
