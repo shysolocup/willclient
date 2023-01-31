@@ -622,21 +622,6 @@ class PSClient {
 			});
 		}
 
-		find(user) {
-			return Fuck();
-			var [bot, client, ctx] = Holder;
-				
-			bot.guild.channels( (channels) => {
-				channels.forEach( (channel) => {
-					if (channel.members.has(user.id) && channel.type == 2) {
-						async function Fuck() {
-							return channel;
-						}
-					}
-				});
-			});
-		}
-
 		lockUser(user) {
 			var [bot, client, ctx] = Holder;
 			bot.guild.channels( (channels) => {
