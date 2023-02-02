@@ -34,21 +34,19 @@ client.command( {name: "selections"}, async (ctx, cmd) => {
 
 /* selection event */
 
-client.event("interaction", async (ctx) => {
-    if (ctx.isSelectMenu()) {
-        if (ctx.customId == "question") {
-            if (ctx.values[0] == "a") {
-                ctx.reply("You picked Option A!");
-            }
-            if (ctx.values[0] == "b") {
-                ctx.reply("You picked Option B!");
-            }
-            if (ctx.values[0] == "c") {
-                ctx.reply("You picked Option C!");
-            }
-            if (ctx.values[0] == "d") {
-                ctx.reply("You picked Option D!");
-            }
+client.selectionAction(async (ctx) => {
+    if (ctx.customId == "question") {
+        if (ctx.values[0] == "a") {
+            ctx.reply("You picked Option A!");
+        }
+        if (ctx.values[0] == "b") {
+            ctx.reply("You picked Option B!");
+        }
+        if (ctx.values[0] == "c") {
+            ctx.reply("You picked Option C!");
+        }
+        if (ctx.values[0] == "d") {
+            ctx.reply("You picked Option D!");
         }
     }
 });
