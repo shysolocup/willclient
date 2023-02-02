@@ -33,17 +33,16 @@ client.command( {name: "buttons"}, async (ctx, cmd) => {
 
 /* button event */
 
-client.event("interaction", async (ctx) => {
-    if (ctx.isButton()) {
-        let id = ctx.customId;
+client.buttonAction(async (ctx) => {
+    let id = ctx.customId;
         
-        if (id == "true") {
-            return ctx.reply("You clicked true!");
-        }
-        if (id == "false") {
-            return ctx.reply("You clicked false!");
-        }
+    if (id == "true") {
+        return ctx.reply("You clicked true!");
+    }
+    if (id == "false") {
+        return ctx.reply("You clicked false!");
     }
 });
+
 
 client.login(config.token);
