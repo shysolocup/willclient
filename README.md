@@ -5,7 +5,7 @@ for a look at some examples check out the examples folder [here](https://github.
 for a full look go check out the docs [here](https://github.com/TheFlameZEternal/Discord.PS/blob/main/docs.md)
 ## Installation
 ```
-npm i TheFlameZEternal/Discord.PS
+npm i nuttmegg/Discord.PS
 
 npm i discord.ps (this is not currently available)
 ```
