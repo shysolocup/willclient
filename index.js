@@ -838,6 +838,26 @@ class PSClient {
 				return message;
 			}
 		}
+		
+	send(content, extras=null) {
+			return Fuck();
+			async function Fuck() {
+				var [bot, client, ctx] = Holder;
+				if (content && extras) {
+					extras["content"] = content; var message = await ctx.channel.send(extras);
+				}
+				else if (typeof content == "object") {
+					extras = content; var message = await ctx.channel.send(extras);
+				}
+				else {
+					var message = await ctx.channel.send(content, extras);
+				}
+				if (extras && extras.deleteAfter) {
+					setTimeout( () => { message.delete(); }, extras.deleteAfter*1000);
+				}
+				return message;
+			}
+		}
 	
 	/* channel */
 	channel = new class {
