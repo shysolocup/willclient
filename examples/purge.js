@@ -16,7 +16,7 @@ psc.event("ready", (ctx) => {
 /* commands */
 
 psc.command( {name: "purge", cooldown: 30}, async (ctx, cmd) => {
-    if (cmd.onCooldown) return ctx.reply("Command is on cooldown.");
+    if (cmd.onCooldown) return psc.reply("Command is on cooldown.", {deleteAfter: 3});
     
     let amount = cmd.args[0];
     
