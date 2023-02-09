@@ -23,4 +23,7 @@ function parse(time) {
     else if (thing == "y") {
         return parseFloat(t.join(""))*60*60*24*365*1000;
     }
+    else {
+        return null;
+    }
 }
