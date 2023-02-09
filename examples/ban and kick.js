@@ -31,5 +31,20 @@ psc.command( {name: "ban", cooldown: 5}, async (ctx, cmd) => {
     }
 });
 
+psc.command( {name: "kick", cooldown: 5}, async (ctx, cmd) => {
+    if (cmd.onCooldown) return psc.reply("Command is on cooldown.", {deleteAfter: 3});
+    
+    let user = await psc.fetchGuildUser(cmd.args[0]);
+    
+    if (psc.user.hasPermissions(["ban"])) {
+        psc.user.ban(user);
+        
+        await psc.channel.send(`Banned ${user}`, {deleteAfter: 5});
+    }
+    else {
+        await psc.channel.send(`You don't have permission to run this command.`, {deleteAfter: 3});
+    }
+});
+
 
 client.login(config.token);
