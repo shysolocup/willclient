@@ -18,7 +18,7 @@ psc.event("ready", (ctx) => {
 psc.command( {name: "purge", cooldown: 30}, async (ctx, cmd) => {
     if (cmd.onCooldown) return psc.reply("Command is on cooldown.", {deleteAfter: 3});
     
-    let amount = cmd.args[0];
+    let amount = parseInt(cmd.args[0]);
     
     if (psc.user.hasPermissions(["manageMessages"])) {
         psc.channel.purge(amount);
