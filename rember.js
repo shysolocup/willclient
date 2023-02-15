@@ -12,8 +12,7 @@ class PSClient {
 }
 
 let psc = new PSClient();
-let Embed = psc.Embed;
 
-let emb = new Embed("a");
+let embed = new psc.Embed("a");
 
-console.log(emb);
+console.log(embed);
