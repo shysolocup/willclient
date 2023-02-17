@@ -38,3 +38,7 @@ client.login(token); // normal discord.js
 
 psc.run(token); // optional alternative
 ```
+
+## Disclaimer
+This mod is not associated with the creators of Discord, Discord.JS, or Discord.PY this was created out of love for Discord bot development because I wanted to make things easier for people. I do not condone harassment of the original developers and or anyone else involved in the creation of them.<br><br>
+I am not responsible for anything made with this mod and be sure to follow [Discord's terms of service](https://discord.com/terms) and their [community guildlines](https://discord.com/guidelines) while developing.
