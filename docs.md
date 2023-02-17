@@ -1,4 +1,8 @@
-# Discord.PS Documentation
+<div align="center">
+	<br />
+	<img src="https://github.com/nuttmegg/discord.ps/blob/main/assets/documentation%20logo.png">
+</div>
+
 ## Setting Up
 #### **== Discord.JS Client ==**
 Discord.PS is built off of Discord.JS so for it to work you need Discord.JS.
