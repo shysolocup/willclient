@@ -14,7 +14,7 @@ npm i nuttmegg/discord.ps
 npm i discord.ps (this is not currently available)
 ```
 ## Setting Up
-#### **== Discord.JS Client ==**
+### **Discord.JS Client**
 Discord.PS is built off of Discord.JS so for it to work you need Discord.JS.
 ```js
 const { Client } = require('discord.js');
@@ -22,7 +22,7 @@ const client = new Client({
 	// your stuff here
 });
 ```
-#### **== Discord.PS Client ==**
+### **Discord.PS Client**
 once you have your discord.js client you can add in Discord.PS.<br>
 *(prefix is optional)*
 ```js
