@@ -18,7 +18,7 @@ npm i discord.ps (this is not currently available)
 Discord.PS is built off of Discord.JS so for it to work you need Discord.JS.
 ```js
 const { Client } = require('discord.js');
-const discordClient = new Client({
+const client = new Client({
 	// your stuff here
 });
 ```
@@ -27,12 +27,12 @@ once you have your discord.js client you can add in Discord.PS.<br>
 *(prefix is optional)*
 ```js
 const { PSClient } = require('discord.ps');
-const client = new PSClient({
-	client: discordClient,
+const psc = new PSClient({
+	client: client,
 	prefix: "!" 
 });
 ```
-once you have your ps client set up and working you can run it using this:
+once you have your ps client set up and working you can run it:
 ```js
 client.login(token);
 ```
