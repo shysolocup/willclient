@@ -35,5 +35,6 @@ const psc = new PSClient({
 once you have your ps client set up and working you can run it using these:
 ```js
 client.login(token); // normal discord.js
+
 psc.run(token); // optional alternative
 ```
