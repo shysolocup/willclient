@@ -3,7 +3,7 @@
 	<img src="https://github.com/nuttmegg/discord.ps/blob/main/assets/logo%20white%20smaller.png">
 </div>
 
-Discord.PS is a combination of Discord.JS and Discord.PY APIs made in Node JS to solve most of the annoying parts of Discord.JS and possibly welcome Discord.PY users into Node JS.<br><br>
+Discord.PS is a combination of Discord.JS and Discord.PY made in Node JS to solve most of the annoying parts of Discord.JS and possibly welcome Discord.PY users into Node JS.<br><br>
 *__THIS IS A VERY EARLY VERSION AND I WILL UPDATE IT OVER TIME__*<br><br>
 for a look at some examples check out the examples folder [here](https://github.com/TheFlameZEternal/Discord.PS/tree/main/examples)<br>
 for a full look go check out the docs [here](https://github.com/nuttmegg/discord.ps/wiki)
