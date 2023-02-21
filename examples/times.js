@@ -1,34 +1,32 @@
 const { Client } = require('discord.js');
-const discordClient = new Client({ /* your stuff here */ });
-
+const client = new Client({ /* your stuff here */ });
 const { PSClient } = require('discord.ps');
-const client = new PSClient({ client: discordClient, prefix: "." });
+const psc = new PSClient({ client: discordClient, prefix: "." });
 
 const config = require('./config.json');
 
-
-client.event("ready", (ctx) => {
+psc.event("ready", (ctx) => {
     console.log(`Logged in as ${ctx.user.tag}`);
 });
 
 /* commands */
 
-client.command( {name: "relative"}, async (ctx, cmd) => {
+psc.command( {name: "relative"}, async (ctx, cmd) => {
     if (cmd.args.length > 0) {
-        return client.reply(client.time.set.relative(cmd.args.join(" ")));
+        return ctx.reply(psc.time.set.relative(cmd.args.join(" ")));
     }
     else {
-        return client.reply(client.time.now.relative);
+        return ctx.reply(psc.time.now.relative);
     }
 });
 
-client.command( {name: "embeds"}, async (ctx, cmd) => {
-    let embed = client.Embed({
+psc.command( {name: "embeds"}, async (ctx, cmd) => {
+    let embed = new psc.Embed({
         description: "this is the time right now:",
-        timestamp: client.time.now.embed
+        timestamp: psc.time.now.embed
     });
     
-    return client.reply({embeds: [embed]});
+    return ctx.reply({embeds: [embed]});
 });
 
 client.login(config.token);
