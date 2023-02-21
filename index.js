@@ -1,4 +1,4 @@
-/* :: Discord.PS :: Version 0.4.1 | 01/31/23 :: */
+/* :: Discord.PS :: Version 0.5.0 | 02/21/23 :: */
 
 /* Made by nutmeg using elements of the NutFL function library.
 	  === https://github.com/TheFlameZEternal/nutfl ===
@@ -7,7 +7,7 @@
 	
 */
 
-const { PermissionsBitField } = require('discord.js');
+const { ActivityType } = require('discord.js');
 const voice = require('@discordjs/voice');
 
 
@@ -89,7 +89,7 @@ class PSClient {
     	time: 0,
     	
     	handle: function(user=null) {
-			var [bot, client, ctx] = Holder;
+			var [psc, client, ctx] = Holder;
 
 			user = (user) ? user : ctx.author;
 					
@@ -101,7 +101,7 @@ class PSClient {
     	},
     	
     	fetch: function(user=null) {
-			var [bot, client, ctx] = Holder;
+			var [psc, client, ctx] = Holder;
 			return (this.data.has( (user) ? user.id : ctx.author.id )) ? true : false;
     	}
 	};
@@ -123,7 +123,11 @@ class PSClient {
     command(info={name:null, aliases:null, cooldown:null}, data) {
 		if (!this.handlerActive) { this.handlerActive = true; ClientHandler(this, this.client); }
 
-		var [name, aliases, time] = [info.name, info.aliases, info.cooldown];
+		var [name, aliases] = [info.name, info.aliases];
+		
+		if (info.cooldown && typeof info.cooldown == "number") { var time = info.cooldown; }
+		else if (info.cooldown && typeof info.cooldown == "string") { var time = this.time.parse(info.cooldown); }
+		else if (info.cooldown) { throw new CoolError("Command Creation", 'Invalid cooldown. ( cooldown: 3 | cooldown: "3s" )'); }
 		
 		if (!name || typeof name != "string" || name.length <= 0) {
 			throw new CoolError("Command Creation", "Invalid command name.\n\nPossible reasons:\n    • doesn't exist\n    • not a string\n    • blank string\n\nActual error stuff:");
@@ -132,7 +136,7 @@ class PSClient {
 			throw new CoolError("Command Creation", "Command with that name already exists.");
 		}
 		if (info.cooldown) {
-			if (typeof info.cooldown != "number") {
+			if (typeof time != "number") {
 				throw new CoolError("Command Creation", "Cooldown has to be an integer (seconds)");
 			}
 			info.cooldown = {
@@ -141,7 +145,7 @@ class PSClient {
     			time: time,
     			
     			handle: function(user=null) {
-					var [bot, client, ctx] = Holder;
+					var [psc, client, ctx] = Holder;
 
 					user = (user) ? user : ctx.author;
 					
@@ -153,7 +157,7 @@ class PSClient {
     			},
     			
     			fetch: function(user=null) {
-					var [bot, client, ctx] = Holder;
+					var [psc, client, ctx] = Holder;
 					return (this.data.has( (user) ? user.id : ctx.author.id )) ? true : false;
     			}
 			};
@@ -278,6 +282,7 @@ class PSClient {
 		"joinGuild": "guildMemberAdd",
 		"newMember": "guildMemberAdd",
 		"memberAdd": "guildMemberAdd",
+		"memberJoin": "guildMemberAdd",
 		"newCommand": "applicationCommandCreate",
 		"commandCreate": "applicationCommandCreate",
 		"createCommand": "applicationCommandCreate",
@@ -425,7 +430,7 @@ class PSClient {
 			? this.eventList[name]
 		: (Object.values(this.eventList).includes(name))
 			? name
-		: function() { throw new CoolError("Bot Event", "Invalid event name.") }();
+		: function() { throw new CoolError("psc Event", "Invalid event name.") }();
 		
 		this.client.on(eventName, (ctx) => {
 			if (eventName == "interactionCreate") {
@@ -439,7 +444,8 @@ class PSClient {
 			return func(ctx);
 		});
     }
-	on(name, func=null) { return this.event(name, func); }
+	on(name, func) { return this.event(name, func); }
+	action(name, func) { return this.event(name, func); }
 	
 	buttonAction(func) {
 		this.client.on("interactionCreate", (ctx) => {
@@ -450,6 +456,14 @@ class PSClient {
 	}
 	
 	selectionAction(func) {
+		this.client.on("interactionCreate", (ctx) => {
+			if (ctx.isSelectMenu()) {
+				return func(ctx);
+			}
+		});
+	}
+
+	selectMenuAction(func) {
 		this.client.on("interactionCreate", (ctx) => {
 			if (ctx.isSelectMenu()) {
 				return func(ctx);
@@ -503,45 +517,47 @@ class PSClient {
 		if (hexColor.startsWith("#")) { var a = hexColor.replace("#", "0x"); return parseInt(a); } else { return 0x5865F2; }
 	}
 	
-	Embed(obj) {
-		if (obj.color) { obj.color = obj.color.colorFormat(); }
-		if (obj.author) {
-			if (obj.author.icon) { obj.author.icon_url = obj.author.icon; }
-			else if (obj.author.iconURL) { obj.author.icon_url = obj.author.iconURL; }
-		}
-		if (typeof obj.thumbnail == "string") {
-			let thumbnail = obj.thumbnail;
-			obj.thumbnail = { url: thumbnail };
-		}
-		if (obj.fields) {
-			let fixFields = [];
-			
-			obj.fields.forEach( (field) => {
-				fixFields.push(field);
-				if (field.newline) { fixFields.push({ name:"** **", value: "** **", inline: false}); }
-			});
-
-			obj.fields = fixFields;
-		}
-		if (typeof obj.image == "string") {
-			let image = obj.image;
-			obj.image = { url: image };
-		}
-		if (obj.timestamp) {
-			if (obj.timestamp.toLowerCase() == "current" || obj.timestamp.toLowerCase() == "now") obj.timestamp = new Date().toISOString();
-		}
-		if (obj.footer) {
-			if (typeof obj.footer == "string") {
-				let footer = obj.footer;
-				obj.footer = { text: footer };
+	Embed = class {
+		constructor(obj) {
+			if (obj.color) { obj.color = obj.color.colorFormat(); }
+			if (obj.author) {
+				if (obj.author.icon) { obj.author.icon_url = obj.author.icon; }
+				else if (obj.author.iconURL) { obj.author.icon_url = obj.author.iconURL; }
+			}
+			if (typeof obj.thumbnail == "string") {
+				let thumbnail = obj.thumbnail;
+				obj.thumbnail = { url: thumbnail };
+			}
+			if (obj.fields) {
+				let fixFields = [];
+				
+				obj.fields.forEach( (field) => {
+					fixFields.push(field);
+					if (field.newline) { fixFields.push({ name:"** **", value: "** **", inline: false}); }
+				});
+	
+				obj.fields = fixFields;
+			}
+			if (typeof obj.image == "string") {
+				let image = obj.image;
+				obj.image = { url: image };
+			}
+			if (obj.timestamp) {
+				if (obj.timestamp.toLowerCase() == "current" || obj.timestamp.toLowerCase() == "now") obj.timestamp = new Date().toISOString();
+			}
+			if (obj.footer) {
+				if (typeof obj.footer == "string") {
+					let footer = obj.footer;
+					obj.footer = { text: footer };
+				}
+				
+				if (obj.footer.name) { obj.footer.text = obj.footer.name; }
+				if (obj.footer.icon) { obj.footer.icon_url = obj.footer.icon; }
+				else if (obj.footer.iconURL) { obj.footer.icon_url = obj.footer.iconURL; }
 			}
 			
-			if (obj.footer.name) { obj.footer.text = obj.footer.name; }
-			if (obj.footer.icon) { obj.footer.icon_url = obj.footer.icon; }
-			else if (obj.footer.iconURL) { obj.footer.icon_url = obj.footer.iconURL; }
+			return obj;
 		}
-		
-		return obj;
 	}
 
 	buttonStyle(style) {
@@ -560,56 +576,74 @@ class PSClient {
 		: null;
 	}
 
-	ActionRow(array) {
-		return { type: 1, components: array };
+	ActionRow = class {
+		constructor(array) {
+			return { type: 1, components: array };
+		}
+	}
+	Row = this.ActionRow;
+
+	Button = class {
+		constructor(obj) {
+			var [psc] = Holder;
+			obj.type = 2;
+			if (obj.id) {
+				obj.custom_id = obj.id;
+			}
+			if (obj.style) {
+				obj.style = psc.buttonStyle(obj.style);
+			}
+			
+			return obj;
+		}
 	}
 
-	Button(obj) {
-		obj.type = 2;
-		if (obj.id) {
-			obj.custom_id = obj.id;
+	Selection = class {
+		constructor(obj) {
+			obj.type = 3;
+			if (obj.id) {
+				obj.custom_id = obj.id;
+			}
+			if (obj.label || obj.text) {
+				obj.placeholder = (obj.label) ? obj.label : obj.text;
+			}
+			if (obj.minimum || obj.min) {
+				obj.min_values = (obj.minimum) ? obj.minimum : obj.min;
+			}
+			if (obj.maximum || obj.max) {
+				obj.max_values = (obj.maximum) ? obj.maximum : obj.max;
+			}
+	
+			return obj;
 		}
-		if (obj.style) {
-			obj.style = this.buttonStyle(obj.style);
-		}
-		
-		return obj;
 	}
 
-	Selection(obj) {
-		obj.type = 3;
-		if (obj.id) {
-			obj.custom_id = obj.id;
-		}
-		if (obj.label || obj.text) {
-			obj.placeholder = (obj.label) ? obj.label : obj.text;
-		}
-		if (obj.minimum || obj.min) {
-			obj.min_values = (obj.minimum) ? obj.minimum : obj.min;
-		}
-		if (obj.maximum || obj.max) {
-			obj.max_values = (obj.maximum) ? obj.maximum : obj.max;
-		}
-
-		return obj;
-	}
+	SelectMenu = this.Selection;
 	
 
-	/* fetches and misc */
-	fetchUser(id) { let mention = id; if (mention.startsWith('<@') && mention.endsWith('>')) {mention = mention.slice(2, -1); if (mention.startsWith('!')) {mention = mention.slice(1); }} mention = mention.split("").join(""); let user = this.client.users.cache.get(mention); return (!user) ? null : user; }
+	/* fetches */
+	fetchUser(id) { if (!id) return null; let mention = id; if (mention.startsWith('<@') && mention.endsWith('>')) {mention = mention.slice(2, -1); if (mention.startsWith('!')) {mention = mention.slice(1); }} mention = mention.split("").join(""); let user = this.client.users.cache.get(mention); return (!user) ? null : user; }
+	fetchMember(id) { return this.fetchUser(id); }
+	
+	fetchGuildUser(id, guild=null) { if (!id) return null; var [psc, client, ctx] = Holder; let mention = id; if (mention.startsWith('<@') && mention.endsWith('>')) {mention = mention.slice(2, -1); if (mention.startsWith('!')) {mention = mention.slice(1); }} mention = mention.split("").join(""); let user = (guild) ? guild.members.fetch(mention) : ctx.guild.members.fetch(mention); return (!user) ? null : user; }
+	fetchGuildMember(id, guild=null) { return this.fetchGuildUser(id, guild); }
+	
+	fetchChannel(id) { if (!id) return null; let rawChannel = id; if (rawChannel.startsWith('<#') && rawChannel.endsWith('>')) {rawChannel = rawChannel.slice(2, -1); } rawChannel = rawChannel.split("").join(""); let channel = this.client.channels.cache.get(rawChannel); return (!channel) ? null : channel; }
 
-	fetchGuildUser(id) { var [bot, client, ctx] = Holder; let mention = id; if (mention.startsWith('<@') && mention.endsWith('>')) {mention = mention.slice(2, -1); if (mention.startsWith('!')) {mention = mention.slice(1); }} mention = mention.split("").join(""); let user = ctx.guild.members.fetch(mention); return (!user) ? null : user; }
+	fetchGuildChannel(id, guild=null) { if (!id) return null; var [psc, client, ctx] = Holder; let rawChannel = id; if (rawChannel.startsWith('<#') && rawChannel.endsWith('>')) {rawChannel = rawChannel.slice(2, -1); } rawChannel = rawChannel.split("").join(""); let channel = (guild) ? guild.channels.fetch(rawChannel) : ctx.guild.channels.fetch(rawChannel); return (!channel) ? null : channel; }
 
-	fetchChannel(id) { let rawChannel = id; if (rawChannel.startsWith('<#') && rawChannel.endsWith('>')) {rawChannel = rawChannel.slice(2, -1); } rawChannel = rawChannel.split("").join(""); let channel = this.client.channels.cache.get(rawChannel); return (!channel) ? null : channel; }
+	fetchRole(id, guild=null) { if (!id) return null; var [psc, client, ctx] = Holder; let rawRole = id; if (rawRole.startsWith('<@') && rawRole.endsWith('>')) {rawRole = rawRole.slice(2, -1); if (rawRole.startsWith('&')) {rawRole = rawRole.slice(1); }} rawRole = rawRole.split("").join(""); let role = (guild) ? guild.roles.fetch(rawRole) : ctx.guild.roles.fetch(rawRole); return (!role) ? null : role; }
+	fetchGuildRole(id, guild=null) { return this.fetchRole(id, guild); }
+	
+	fetchGuild(id) { if (!id) return null; let guild = this.client.guilds.cache.get(id); return (!guild) ? null : guild; }
 
-	fetchGuildChannel(id) { var [bot, client, ctx] = Holder; let rawChannel = id; if (rawChannel.startsWith('<#') && rawChannel.endsWith('>')) {rawChannel = rawChannel.slice(2, -1); } rawChannel = rawChannel.split("").join(""); let channel = ctx.guild.channels.fetch(rawChannel); return (!channel) ? null : channel; }
-
-	fetchGuildRole(id) { var [bot, client, ctx] = Holder; let rawRole = id; if (rawRole.startsWith('<@') && rawRole.endsWith('>')) {rawRole = rawRole.slice(2, -1); if (rawRole.startsWith('&')) {rawRole = rawRole.slice(1); }} rawRole = rawRole.split("").join(""); let role = ctx.guild.roles.fetch(rawRole); return (!role) ? null : role; }
-
+	
+	/* sleeps */
 	sleep(time) { return new Promise(resolve => setTimeout(resolve, time*1000)); }
-
+	
 	sleepMs(time) { return new Promise(resolve => setTimeout(resolve, time)); }
 
+	
 	/* random */
 	random = new class {
 		number(min, max) {
@@ -645,25 +679,43 @@ class PSClient {
 			get longDT() { return `<t:${Math.round(new Date().getTime() / 1000)}:F>` }
 			get relative() { return `<t:${Math.round(new Date().getTime() / 1000)}:R>` }
 		}
+		parse(string) {
+			if (typeof string != "string") {
+				return parseFloat(string);
+			}
+    		let t = string.split("");
+    		let thing = t.pop();
+    
+    		if (thing == "s") { return parseFloat(t.join("")); }
+			else if (thing == "ms") { return parseFloat(t.join(""))*1000; }
+    		else if (thing == "m") { return parseFloat(t.join(""))*60; }
+    		else if (thing == "h") { return parseFloat(t.join(""))*60*60; }
+    		else if (thing == "d") { return parseFloat(t.join(""))*60*60*24; }
+    		else if (thing == "w") { return parseFloat(t.join(""))*60*60*24*7; }
+    		else if (thing == "y") { return parseFloat(t.join(""))*60*60*24*365; }
+    		else { return parseFloat(string); }
+		}
 	}
+	date = this.time;
 	
 	
 	/* voice */
 	voice = new class {
-		find(user, func) {
-			var [bot, client, ctx] = Holder;
-			bot.guild.channels( (channels) => {
+		fetch(user, func) {
+			var [psc, client, ctx] = Holder;
+			psc.guild.channelF( (channels) => {
 				channels.forEach( (channel) => {
 					if (channel.members.has(user.id) && channel.type == 2) {
-						func(channel);
+						return func(channel);
 					}
 				});
 			});
 		}
+		find(user, func) { return this.fetch(user, func); }
 		
 		mute(user) {
-			var [bot, client, ctx] = Holder;
-			bot.guild.channels( (channels) => {
+			var [psc, client, ctx] = Holder;
+			psc.guild.channelF( (channels) => {
 				channels.forEach( (channel) => {
 					if (channel.members.has(user.id) && channel.type == 2) {
 						let vcUser = channel.members.get(user.id);
@@ -674,8 +726,8 @@ class PSClient {
 		}
 
 		unmute(user) {
-			var [bot, client, ctx] = Holder;
-			bot.guild.channels( (channels) => {
+			var [psc, client, ctx] = Holder;
+			psc.guild.channelF( (channels) => {
 				channels.forEach( (channel) => {
 					if (channel.members.has(user.id) && channel.type == 2) {
 						let vcUser = channel.members.get(user.id);
@@ -686,8 +738,8 @@ class PSClient {
 		}
 
 		deafen(user) {
-			var [bot, client, ctx] = Holder;
-			bot.guild.channels( (channels) => {
+			var [psc, client, ctx] = Holder;
+			psc.guild.channelF( (channels) => {
 				channels.forEach( (channel) => {
 					if (channel.members.has(user.id) && channel.type == 2) {
 						let vcUser = channel.members.get(user.id);
@@ -698,8 +750,8 @@ class PSClient {
 		}
 
 		undeafen(user) {
-			var [bot, client, ctx] = Holder;
-			bot.guild.channels( (channels) => {
+			var [psc, client, ctx] = Holder;
+			psc.guild.channelF( (channels) => {
 				channels.forEach( (channel) => {
 					if (channel.members.has(user.id) && channel.type == 2) {
 						let vcUser = channel.members.get(user.id);
@@ -710,8 +762,8 @@ class PSClient {
 		}
 
 		lockUser(user) {
-			var [bot, client, ctx] = Holder;
-			bot.guild.channels( (channels) => {
+			var [psc, client, ctx] = Holder;
+			psc.guild.channelF( (channels) => {
 				channels.forEach( (channel) => {
 					if (channel.members.has(user.id) && channel.type == 2) {
 						let vcUser = channel.members.get(user.id);
@@ -723,8 +775,8 @@ class PSClient {
 		}
 
 		unlockUser(user) {
-			var [bot, client, ctx] = Holder;
-			bot.guild.channels( (channels) => {
+			var [psc, client, ctx] = Holder;
+			psc.guild.channelF( (channels) => {
 				channels.forEach( (channel) => {
 					if (channel.members.has(user.id) && channel.type == 2) {
 						let vcUser = channel.members.get(user.id);
@@ -736,16 +788,16 @@ class PSClient {
 		}
 		
 		lock(channel) {
-			var [bot, client, ctx] = Holder;
+			var [psc, client, ctx] = Holder;
 			let vc = client.channels.cache.get(channel.id);
 			vc.members.forEach( (user) => {
-				user.voice.setMute(true);
+				user.voice.setMute(true); 
 				user.voice.setDeaf(true);
 			});
 		}
 
 		unlock(channel) {
-			var [bot, client, ctx] = Holder;
+			var [psc, client, ctx] = Holder;
 			let vc = client.channels.cache.get(channel.id);
 			vc.members.forEach( (user) => {
 				user.voice.setMute(false);
@@ -763,108 +815,303 @@ class PSClient {
 		
 		leave(channel) {
 			const connection = voice.getVoiceConnection(channel.guild.id);
-			try {
-				connection.destroy();
-			} catch(err) {
-				throw new CoolError("Leaving Voice Channel", "Not in channel or cannot leave.");
-			}
+			try { connection.destroy(); } catch(err) {}
 		}
 	}
 	
 	/* guild */
 	guild = new class {
-		get memberCount() {
-			var [bot, client, ctx] = Holder; return ctx.guild.memberCount;
+		memberCount(guild=null) {
+			var [psc, client, ctx] = Holder; return (guild) ? guild.memberCount : ctx.guild.memberCount;
 		}
 		
-		get roleCount() {
-			var [bot, cilent, ctx] = Holder; return ctx.guild.roles.cache.size;
+		roleCount(guild=null) {
+			var [psc, cilent, ctx] = Holder; return (guild) ? guild.roles.cache.size : ctx.guild.roles.cache.size;
 		}
 		
-		get channelCount() {
-			var [bot, client, ctx] = Holder; return ctx.guild.channels.cache.size;
+		channelCount(guild=null) {
+			var [psc, client, ctx] = Holder; return (guild) ? guild.channels.cache.size : ctx.guild.channels.cache.size;
 		}
 		
-		get emojiCount() {
-			var [bot, client, ctx] = Holder; return ctx.guild.emojis.cache.size;
+		emojiCount(guild=null) {
+			var [psc, client, ctx] = Holder; return (guild) ? guild.emojis.cache.size : ctx.guild.emojis.cache.size;
 		}
 		
-		get stickerCount() {
-			var [bot, client, ctx] = Holder; return ctx.guild.stickers.cache.size;
+		stickerCount(guild=null) {
+			var [psc, client, ctx] = Holder; return (guild) ? guild.stickers.cache.size : ctx.guild.stickers.cache.size;
 		}
 
-		members(func) {
-			var [bot, client, ctx] = Holder;
-			ctx.guild.members.fetch().then(members => FuckPromises(members, func, true));
+		members(func, guild=null) {
+			var [psc, client, ctx] = Holder;
+			if (guild) {
+				guild.members.fetch().then(stuff => FuckPromises(stuff, func, true));
+			} else {
+				ctx.guild.members.fetch().then(stuff => FuckPromises(stuff, func, true));
+			}
+		}
+		users(func, guild=null) { return this.memberF(func, guild); }
+
+		roles(guild=null) {
+			var [psc, client, ctx] = Holder;
+			if (guild) {
+				return Array.from(guild.roles.cache, (role) => { return role[1]; });
+			} else {
+				return Array.from(ctx.guild.roles.cache, (role) => { return role[1]; });
+			}
 		}
 
-		roles(func) {
-			var [bot, client, ctx] = Holder;
-			ctx.guild.roles.fetch().then(channels => FuckPromises(channels, func));
+		roleF(func, guild=null) {
+			var [psc, client, ctx] = Holder;
+			if (guild) {
+				guild.roles.fetch().then(stuff => FuckPromises(stuff, func));
+			} else {
+				ctx.guild.roles.fetch().then(stuff => FuckPromises(stuff, func));
+			}
 		}
 
-		channels(func) {
-			var [bot, client, ctx] = Holder;
-			ctx.guild.channels.fetch().then(channels => FuckPromises(channels, func));
+		stuff(guild=null) {
+			var [psc, client, ctx] = Holder;
+			if (guild) {
+				return Array.from(guild.channels.cache, (channel) => { return channel[1]; });
+			} else {
+				return Array.from(ctx.guild.channels.cache, (channel) => { return channel[1]; });
+			}
 		}
 
-		emojis(func) {
-			var [bot, client, ctx] = Holder;
-			ctx.guild.emojis.fetch().then(emojis => FuckPromises(emojis, func));
+		channels(guild=null) {
+			var [psc, client, ctx] = Holder;
+			var list;
+			if (guild) {
+				list = Array.from(guild.channels.cache, (channel) => {
+					if (channel[1].type != 4) { return channel[1]; }
+				});
+			} else {
+				list = Array.from(ctx.guild.channels.cache, (channel) => {
+					if (channel[1].type != 4) { return channel[1]; }
+				});
+			}
+
+			list = list.filter((thing) => {
+				return thing !== undefined;
+			});
+			
+			return list;
 		}
 
-		stickers(func) {
-			var [bot, client, ctx] = Holder;
-			ctx.guild.stickers.fetch().then(stickers => FuckPromises(stickers, func));
+		channelF(func, guild=null) {
+			var [psc, client, ctx] = Holder;
+			if (guild) {
+				guild.channels.fetch().then(stuff => FuckPromises(stuff, func));
+			} else {
+				ctx.guild.channels.fetch().then(stuff => FuckPromises(stuff, func));
+			}
+		}
+
+		categories(guild=null) {
+			var [psc, client, ctx] = Holder;
+			var list;
+			if (guild) {
+				list = Array.from(guild.channels.cache, (channel) => {
+					if (channel[1].type == 4) { return channel[1]; }
+				});
+			} else {
+				list = Array.from(ctx.guild.channels.cache, (channel) => {
+					if (channel[1].type == 4) { return channel[1]; }
+				});
+			}
+
+			list = list.filter((thing) => {
+				return thing !== undefined;
+			});
+			
+			return list;
+		}
+
+		textChannels(guild=null) {
+			var [psc, client, ctx] = Holder;
+			var list;
+			if (guild) {
+				list = Array.from(guild.channels.cache, (channel) => {
+					if (channel[1].type == 0) { return channel[1]; }
+				});
+			} else {
+				list = Array.from(ctx.guild.channels.cache, (channel) => {
+					if (channel[1].type == 0) { return channel[1]; }
+				});
+			}
+
+			list = list.filter((thing) => {
+				return thing !== undefined;
+			});
+			
+			return list;
+		}
+		TCs(guild=null) { return this.textChannels(guild); }
+
+		voiceChannels(guild=null) {
+			var [psc, client, ctx] = Holder;
+			var list;
+			if (guild) {
+				list = Array.from(guild.channels.cache, (channel) => {
+					if (channel[1].type == 2) { return channel[1]; }
+				});
+			} else {
+				list = Array.from(ctx.guild.channels.cache, (channel) => {
+					if (channel[1].type == 2) { return channel[1]; }
+				});
+			}
+
+			list = list.filter((thing) => {
+				return thing !== undefined;
+			});
+			
+			return list;
+		}
+		VCs(guild=null) { return this.voiceChannels(guild); }
+
+		threadChannels(guild=null) {
+			var [psc, client, ctx] = Holder;
+			var list;
+			if (guild) {
+				list = Array.from(guild.channels.cache, (channel) => {
+					if (channel[1].type == 11) { return channel[1]; }
+				});
+			} else {
+				list = Array.from(ctx.guild.channels.cache, (channel) => {
+					if (channel[1].type == 11) { return channel[1]; }
+				});
+			}
+
+			list = list.filter((thing) => {
+				return thing !== undefined;
+			});
+			
+			return list;
+		}
+		threads(guild=null) { return this.threadChannels(guild); }
+		
+		emojis(guild=null) {
+			var [psc, client, ctx] = Holder;
+			if (guild) {
+				return Array.from(guild.emojis.cache, (emoji) => { return emoji[1]; });
+			} else {
+				return Array.from(ctx.guild.emojis.cache, (emoji) => { return emoji[1]; });
+			}
+		}
+
+		emojiF(func, guild=null) {
+			var [psc, client, ctx] = Holder;
+			if (guild) {
+				guild.emojis.fetch().then(stuff => FuckPromises(stuff, func));
+			} else {
+				ctx.emojis.roles.fetch().then(stuff => FuckPromises(stuff, func));
+			}
+		}
+
+		stickers(guild=null) {
+			var [psc, client, ctx] = Holder;
+			if (guild) {
+				return Array.from(guild.stickers.cache, (sticker) => { return sticker[1]; });
+			} else {
+				return Array.from(ctx.guild.stickers.cache, (sticker) => { return sticker[1]; });
+			}
+		}
+
+		stickerF(func, guild=null) {
+			var [psc, client, ctx] = Holder;
+			if (guild) {
+				guild.stickers.fetch().then(stuff => FuckPromises(stuff, func));
+			} else {
+				ctx.guild.stickers.fetch().then(stuff => FuckPromises(stuff, func));
+			}
 		}
 	}
+	server = this.guild;
 
 	reply(content, extras=null) {
-			return Fuck();
-			async function Fuck() {
-				var [bot, client, ctx] = Holder;
-				if (content && extras) {
-					extras["content"] = content; var message = await ctx.reply(extras);
-				}
-				else if (typeof content == "object") {
-					extras = content; var message = await ctx.reply(extras);
-				}
-				else {
-					var message = await ctx.reply(content, extras);
-				}
-				if (extras && extras.deleteAfter) {
-					setTimeout( () => { message.delete(); }, extras.deleteAfter*1000);
-				}
-				return message;
+		return Fuck();
+		async function Fuck() {
+			var [psc, client, ctx] = Holder;
+			if (content && extras) {
+				extras["content"] = content; var message = await ctx.reply(extras);
 			}
+			else if (typeof content == "object") {
+				extras = content; var message = await ctx.reply(extras);
+			}
+			else {
+				var message = await ctx.reply(content, extras);
+			}
+			if (extras && extras.deleteAfter) {
+				setTimeout( () => { message.delete(); }, psc.time.parse(extras.deleteAfter)*1000);
+			}
+			return message;
 		}
+	}
 		
 	send(content, extras=null) {
-			return Fuck();
-			async function Fuck() {
-				var [bot, client, ctx] = Holder;
-				if (content && extras) {
-					extras["content"] = content; var message = await ctx.channel.send(extras);
-				}
-				else if (typeof content == "object") {
-					extras = content; var message = await ctx.channel.send(extras);
-				}
-				else {
-					var message = await ctx.channel.send(content, extras);
-				}
-				if (extras && extras.deleteAfter) {
-					setTimeout( () => { message.delete(); }, extras.deleteAfter*1000);
-				}
-				return message;
+		return Fuck();
+		async function Fuck() {
+			var [psc, client, ctx] = Holder;
+			if (content && extras) {
+				extras["content"] = content; var message = await ctx.channel.send(extras);
 			}
+			else if (typeof content == "object") {
+				extras = content; var message = await ctx.channel.send(extras);
+			}
+			else {
+				var message = await ctx.channel.send(content, extras);
+			}
+			if (extras && extras.deleteAfter) {
+				setTimeout( () => { message.delete(); }, psc.time.parse(extras.deleteAfter)*1000);
+			}
+			return message;
 		}
+	}
 	
 	/* channel */
 	channel = new class {
+		permissions = new class {
+			sync(channel=null) {
+				var [psc, client, ctx] = Holder;
+				if (!channel) {
+					ctx.channel.lockPermissions();
+				} else {
+					channel.lockPermissions();
+				}
+			}
+
+			set(array, channel=null) {
+				var [psc, client, ctx] = Holder;
+				if (!channel) {
+					ctx.channel.permissionOverwrites.set(array);
+				} else {
+					channel.permissionOverwrites.set(array);
+				}
+			}
+
+			edit(id, permissions, channel=null) {
+				var [psc, client, ctx] = Holder;
+				if (!channel) {
+					ctx.channel.permissionOverwrites.edit(id, permissions);
+				} else {
+					channel.permissionOverwrites.edit(id, permissions);
+				}
+			}
+
+			delete(id, channel=null) {
+				var [psc, client, ctx] = Holder;
+				if (!channel) {
+					ctx.channel.permissionOverwrites.delete(id);
+				} else {
+					channel.permissionOverwrites.delete(id);
+				}
+			}
+		}
+		
 		send(content, extras=null) {
 			return Fuck();
 			async function Fuck() {
-				var [bot, client, ctx] = Holder;
+				var [psc, client, ctx] = Holder;
 				if (content && extras) {
 					extras["content"] = content; var message = await ctx.channel.send(extras);
 				}
@@ -875,14 +1122,14 @@ class PSClient {
 					var message = await ctx.channel.send(content, extras);
 				}
 				if (extras && extras.deleteAfter) {
-					setTimeout( () => { message.delete(); }, extras.deleteAfter*1000);
+					setTimeout( () => { message.delete(); }, psc.time.parse(extras.deleteAfter)*1000);
 				}
 				return message;
 			}
 		}
 		
 		purge(amount, channel=null) {
-			var [bot, client, ctx] = Holder;
+			var [psc, client, ctx] = Holder;
 			if (!channel) {
 				ctx.channel.bulkDelete(amount);
 			} else {
@@ -891,7 +1138,7 @@ class PSClient {
 		}
 		
 		lock(channel=null) {
-			var [bot, client, ctx] = Holder;
+			var [psc, client, ctx] = Holder;
 			if (!channel) {
 				ctx.channel.permissionOverwrites.edit(ctx.guild.roles.everyone.id, { SendMessages: false });
 			} else {
@@ -900,7 +1147,7 @@ class PSClient {
 		}
 
 		unlock(channel=null) {
-			var [bot, client, ctx] = Holder;
+			var [psc, client, ctx] = Holder;
 			if (!channel) {
 				ctx.channel.permissionOverwrites.edit(ctx.guild.roles.everyone.id, { SendMessages: true });
 			} else {
@@ -909,7 +1156,7 @@ class PSClient {
 		}
 		
 		setSlowmode(time, channel=null) {
-			var [bot, client, ctx] = Holder;
+			var [psc, client, ctx] = Holder;
 			if (!channel) {
 				ctx.channel.setRateLimitPerUser(time);
 			} else {
@@ -918,14 +1165,267 @@ class PSClient {
 		}
 
 		removeSlowmode(channel=null) {
-			var [bot, client, ctx] = Holder;
+			var [psc, client, ctx] = Holder;
 			if (!channel) {
 				ctx.channel.setRateLimitPerUser(0);
 			} else {
 				channel.setRateLimitPerUser(0);
 			}
 		}
+		noSlowmode(channel=null) { return this.removeSlowmode(channel); }
 	}
+
+	/* users and permissions */
+
+	permissionList = {
+		"createInvite": "CreateInstantInvite",
+		"kickMembers": "KickMembers",
+		"kick": "KickMembers",
+		"banMembers": "BanMembers",
+		"ban": "BanMembers",
+		"moderateMembers": "ModerateMembers",
+		"moderate": "ModerateMembers",
+		"administrator": "Administrator",
+		"admin": "Administrator",
+		"manageChannels": "ManageChannels",
+		"manageGuild": "manageGuild",
+		"addReactions": "AddReactions",
+		"reactions": "AddReactions",
+		"react": "AddReactions",
+		"viewAuditLog": "ViewAuditLogs",
+		"viewLogs": "ViewAuditLogs",
+		"auditLogs": "ViewAuditLogs",
+		"logs": "ViewAuditLogs",
+		"prioritySpeaker": "PrioritySpeaker",
+		"stream": "Stream",
+		"viewChannel": "ViewChannel",
+		"sendMessages": "SendMessages",
+		"send": "SendMessages",
+		"message": "SendMessages",
+		"sendTTSMessages": "SendTTSMessages",
+		"sendTTS": "SendTTSMessages",
+		"manageMessages": "ManageMessages",
+		"embedLinks": "EmbedLinks",
+		"links": "EmbedLinks",
+		"attachFiles": "AttachFiles",
+		"sendFiles": "AttachFiles",
+		"files": "AttachFiles",
+		"readMessageHistory": "ReadMessageHistory",
+		"readHistory": "ReadMessageHistory",
+		"viewMessageHistory": "ReadMessageHistory",
+		"viewHistory": "ReadMessageHistory",
+		"mentionEveryone": "MentionEveryone",
+		"pingEveryone": "MentionEveryone",
+		"everyone": "MentionEveryone",
+		"useExternalEmojis": "UseExternalEmojis",
+		"externalEmojis": "UseExternalEmojis",
+		"useEmojis": "UseExternalEmojis",
+		"useExternalStickers": "UseExternalStickers",
+		"externalStickers": "UseExternalStickers",
+		"useStickers": "UseExternalStickers",
+		"viewGuildInsights": "ViewGuildInsights",
+		"guildInsights": "ViewGuildInsights",
+		"insights": "ViewGuildInsights",
+		"connect": "Connect",
+		"voiceConnect": "Connect",
+		"speak": "Speak",
+		"voiceSpeak": "Speak",
+		"muteMembers": "MuteMembers",
+		"mute": "MuteMembers",
+		"voiceMute": "MuteMembers",
+		"deafenMembers": "DeafenMembers",
+		"deafen": "DeafenMembers",
+		"voiceDeafen": "DeafenMembers",
+		"moveMembers": "MoveMembers",
+		"move": "MoveMembers",
+		"voiceMove": "MoveMembers",
+		"useVAD": "UseVAD",
+		"VAD": "UseVAD",
+		"changeNickname": "ChangeNickname",
+		"nickname": "ChangeNickname",
+		"manageNicknames": "ManageNickname",
+		"nicknames": "ManageNickname",
+		"manageRoles": "ManageRoles",
+		"roles": "ManageRoles",
+		"manageWebhooks": "ManageWebhooks",
+		"manageEmojisAndStickers": "ManageEmojisAndStickers",
+		"manageEmojis": "ManageEmojisAndStickers",
+		"manageStickers": "ManageEmojisAndStickers",
+		"emojis": "ManageEmojisAndStickers",
+		"stickers": "ManageEmojisAndStickers",
+		"emojisAndStickers": "ManageEmojisAndStickers",
+		"useApplicationCommands": "UseApplicationCommands",
+		"useCommands": "UseApplicationCommands",
+		"applicationCommands": "UseApplicationCommands",
+		"commands": "UseApplicationCommands",
+		"requestToSpeak": "RequestToSpeak",
+		"manageEvents": "ManageEvents",
+		"events": "ManageEvents",
+		"manageThreads": "ManageThreads",
+		"threads": "ManageThreads",
+		"createPublicThreads": "CreatePublicThreads",
+		"publicThreads": "CreatePublicThreads",
+		"createPrivateThreads": "CreatePrivateThreads",
+		"privateThreads": "CreatePrivateThreads",
+		"sendMessagesInThreads": "SendMessagesInThreads",
+		"sendThreadMessages": "SendMessagesInThreads",
+		"threadMessages": "SendMessagesInThreads",
+		"messageInThreads": "SendMessagesInThreads",
+		"useEmbeddedActivities": "UseEmbeddedActivities",
+		"useActivities": "UseEmbeddedActivities",
+		"embeddedActivities": "UseEmbeddedActivities",
+		"activities": "UseEmbeddedActivities"
+	};
+	
+	user = new class {
+		avatar(user=null, dynamic=false) {
+			var [psc, client, ctx] = Holder;
+			if (!user) {
+				return ctx.author.displayAvatarURL(dynamic);
+			} else {
+				return user.displayAvatarURL(dynamic);
+			}
+		}
+		avatarUrl(user=null, dynamic=false) { return this.avatar(user, dynamic); }
+		avatarURL(user=null, dynamic=false) { return this.avatar(user, dynamic); }
+		avatar_url(user=null, dynamic=false) { return this.avatar(user, dynamic); }
+		
+		roles = new class {
+			cache(user=null) {
+				var [psc, client, ctx] = Holder;
+				if (!user) {
+					return ctx.member.roles.cache;
+				} else {
+					return user.roles.cache;
+				}
+			}
+			
+			list(user=null) {
+				var [psc, client, ctx] = Holder;
+				if (!user) {
+					return Array.from(ctx.member.roles.cache, (role) => {
+						return role[1].name;
+					});
+				} else {
+					return Array.from(user.roles.cache, (role) => {
+						return role[1].name;
+					});
+				}
+			}
+
+			ids(user=null) {
+				var [psc, client, ctx] = Holder;
+				if (!user) {
+					return Array.from(ctx.member.roles.cache, (role) => {
+						return role[0];
+					});
+				} else {
+					return Array.from(user.roles.cache, (role) => {
+						return role[0];
+					});
+				}
+			}
+			
+			has(roleId, user=null) {
+				var [psc, client, ctx] = Holder;
+				if (!user) {
+					return ctx.member.roles.cache.has(roleId);
+				} else {
+					return user.roles.cache.has(roleId);
+				}
+			}
+
+			hasName(name, user=null) {
+				var [psc, client, ctx] = Holder;
+				if (!user) {
+					return ctx.member.roles.cache.some(role => role.name == name);
+				} else {
+					return user.roles.cache.some(role => role.name == name);
+				}
+			}
+		}
+
+		permissions = new class {
+			cache(user=null) {
+				var [psc, client, ctx] = Holder;
+				if (!user) {
+					return ctx.member.permissions.serialize();
+				} else {
+					return user.permissions.serialize();
+				}
+			}
+
+			list(user=null) {
+				var [psc, client, ctx] = Holder;
+				if (!user) {
+					return ctx.member.permissions.toArray();
+				} else {
+					return user.permissions.toArray();
+				}
+			}
+
+			has(permissions, user=null) {
+				var [psc, client, ctx] = Holder;
+				var perms = [];
+				
+				permissions.forEach( (perm) => {
+					let permName = (Object.keys(psc.permissionList).includes(perm))
+						? psc.permissionList[perm]
+					: (Object.values(psc.permissionList).includes(perm))
+						? perm
+					: function() { throw new CoolError("Has Permissions", "Permission does not exist.") }();
+
+					perms.push(permName);
+				});
+
+				for (let i = 0; i < perms.length; i++) {
+					if (!user) {
+						if (!ctx.member.permissions.toArray().includes(perms[i])) {
+							return false;
+						}
+					} else {
+						if (!user.permissions.toArray().includes(perms[i])) {
+							return false;
+						}
+					}
+				}
+				return true;
+			}
+		}
+
+		roleCache(user=null) {
+			return this.roles.cache(user);
+		}
+
+		roleList(user=null) {
+			return this.roles.list(user);
+		}
+
+		rolesIds(user=null) {
+			return this.roles.ids(user);
+		}
+
+		hasRole(roleId, user=null) {
+			return this.roles.has(roleId, user);
+		}
+		
+		hasRoleName(name, user=null) {
+			return this.roles.hasName(name, user);	
+		}
+
+		permissionCache(user=null) {
+			return this.permissions.cache(user);
+		}
+
+		permissionList(user=null) {
+			return this.permissions.list(user);
+		}
+
+		hasPermissions(permissions, user=null) {
+			return this.permissions.has(permissions, user);
+		}
+	}
+	member = this.user;
 	
     /* running */
     run(token) {
@@ -937,19 +1437,19 @@ class PSClient {
     }
 }
 
-function ClientHandler(bot, client) {
+function ClientHandler(psc, client) {
 	console.log("Commands Enabled");
 	client.on("messageCreate", async (ctx) => {
-		Holder = [bot, client, ctx];
-		bot.commandHandler(ctx);
+		Holder = [psc, client, ctx];
+		psc.commandHandler(ctx);
 	});
 }
 
 function FuckPromises(stupids, func, user=false) {
-	var [bot, client, ctx] = Holder;
+	var [psc, client, ctx] = Holder;
 	var stupidList = [];
 	stupids.forEach( (stupid) => {
-		stupidList.push( (user) ? bot.fetchUser(stupid.id) : stupid);
+		stupidList.push( (user) ? psc.fetchUser(stupid.id) : stupid);
 	});
 
 	return func(stupidList);
