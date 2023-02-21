@@ -7,12 +7,20 @@ Discord.PS is a combination of Discord.JS and Discord.PY APIs made in Node JS to
 *__THIS IS A VERY EARLY VERSION AND I WILL UPDATE IT OVER TIME__*<br><br>
 for a look at some examples check out the examples folder [here](https://github.com/TheFlameZEternal/Discord.PS/tree/main/examples)<br>
 for a full look go check out the docs [here](https://github.com/nuttmegg/discord.ps/wiki)
-## Installation
-```
-npm i nuttmegg/discord.ps
 
-npm i discord.ps (this is not currently available)
+<br>
+
+## Installation
+```console
+npm i nuttmegg/discord.ps
 ```
+*⬇⬇ This one is not currently available ⬇⬇*
+```console
+npm i discord.ps
+```
+
+<br>
+
 ## Setting Up
 ### **Discord.JS Client**
 Discord.PS is built off of Discord.JS so for it to work you need Discord.JS.
