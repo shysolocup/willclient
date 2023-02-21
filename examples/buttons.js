@@ -1,39 +1,37 @@
 const { Client } = require('discord.js');
-const discordClient = new Client({ /* your stuff here */ });
-
+const client = new Client({ /* your stuff here */ });
 const { PSClient } = require('discord.ps');
-const client = new PSClient({ client: discordClient, prefix: "." });
+const psc = new PSClient({ client: discordClient, prefix: "." });
 
 const config = require('./config.json');
 
-
-client.event("ready", (ctx) => {
+psc.event("ready", (ctx) => {
     console.log(`Logged in as ${ctx.user.tag}`);
 });
 
 /* commands */
 
-client.command( {name: "buttons"}, async (ctx, cmd) => {
-    let trueButton = client.Button({
+psc.command( {name: "buttons"}, async (ctx, cmd) => {
+    let trueButton = new psc.Button({
         id: "true",
         label: "True",
         style: "primary"
     });
     
-    let falseButton = client.Button({
+    let falseButton = new psc.Button({
         id: "false",
         label: "False",
         style: "Danger"
     });
     
-    let row = client.ActionRow([trueButton, falseButton]);
+    let row = new psc.ActionRow([trueButton, falseButton]);
     
-    client.reply("Choose wisely..", { components: [row]});
+    psc.reply("Choose wisely..", { components: [row]});
 });
 
 /* button event */
 
-client.buttonAction(async (ctx) => {
+psc.buttonAction(async (ctx) => {
     let id = ctx.customId;
         
     if (id == "true") {
