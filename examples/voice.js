@@ -1,48 +1,46 @@
 const { Client } = require('discord.js');
-const discordClient = new Client({ /* your stuff here */ });
-
+const client = new Client({ /* your stuff here */ });
 const { PSClient } = require('discord.ps');
-const client = new PSClient({ client: discordClient, prefix: "." });
+const psc = new PSClient({ client: client, prefix: "." });
 
 const config = require('./config.json');
 
-
-client.event("ready", (ctx) => {
+psc.event("ready", (ctx) => {
     console.log(`Logged in as ${ctx.user.tag}`);
 });
 
 /* commands */
 
-client.command( {name: "join"}, async (ctx, cmd) => {
-    let channel = client.fetchChannel("id");
+psc.command( {name: "join"}, async (ctx, cmd) => {
+    let channel = psc.fetchChannel("id");
     
-    client.voice.join(channel);
+    psc.voice.join(channel);
     
-    client.reply(`Joined ${channel.name}!`);
+    ctx.reply(`Joined ${channel.name}!`);
 });
 
-client.command( {name: "leave"}, async (ctx, cmd) => {
-    let channel = client.fetchChannel("id");
+psc.command( {name: "leave"}, async (ctx, cmd) => {
+    let channel = psc.fetchChannel("id");
     
-    client.voice.leave(channel);
+    psc.voice.leave(channel);
     
-    client.reply(`Left ${channel.name}!`);
+    ctx.reply(`Left ${channel.name}!`);
 });
 
-client.command( {name: "lock"}, async (ctx, cmd) => {
-    let channel = client.fetchChannel(cmd.args[0]); // channel given in the message either with id or with #channel
+psc.command( {name: "lock"}, async (ctx, cmd) => {
+    let channel = psc.fetchChannel(cmd.args[0]); // channel given in the message either with id or with #channel
     
-    client.voice.lock(channel); // mutes and deafens everyone in the voice channel
+    psc.voice.lock(channel); // mutes and deafens everyone in the voice channel
     
-    client.reply(`Locked ${channel.name}!`);
+    ctx.reply(`Locked ${channel.name}!`);
 });
 
-client.command( {name: "unlock"}, async (ctx, cmd) => {
-    let channel = client.fetchChannel(cmd.args[0]);
+psc.command( {name: "unlock"}, async (ctx, cmd) => {
+    let channel = psc.fetchChannel(cmd.args[0]);
     
-    client.voice.unlock(channel); // mutes and deafens everyone in the voice channel
+    psc.voice.unlock(channel); // mutes and deafens everyone in the voice channel
     
-    client.reply(`Unlocked ${channel.name}!`);
+    ctx.reply(`Unlocked ${channel.name}!`);
 });
 
 client.login(config.token);
