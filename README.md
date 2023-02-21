@@ -2,7 +2,7 @@
 
 <div align="center" text-align="center">
 	<br />
-	<img src="https://github.com/nuttmegg/discord.ps/blob/main/assets/logo%20white%20smaller.png">
+	<img src="https://github.com/nuttmegg/discord.ps/blob/main/assets/logo_white.png">
 
 Discord.PS is a combination of [Discord.JS](https://discord.js.org/) and [Discord.PY](https://github.com/Rapptz/discord.py) made in [Node.JS](https://nodejs.org/en/) to solve most of the annoying parts of Discord.JS and possibly welcome Discord.PY users into Node.JS
 
