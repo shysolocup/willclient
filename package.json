@@ -14,6 +14,11 @@
     "bugs": {
         "url": "https://github.com/TheFlameZEternal/Discord.PS/issues"
     },
+    "keywords": [
+        "discord.js",
+        "discord.ps",
+        "discord"
+    ],
     "homepage": "https://github.com/TheFlameZEternal/Discord.PS",
     "main": "./index.js"
 }
