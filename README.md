@@ -19,6 +19,8 @@ for a full look at everything go check out the [wiki pages](https://github.com/n
 
 ---
 
+<br>
+
 ## Installation
 ```console
 npm i nuttmegg/discord.ps
