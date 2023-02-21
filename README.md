@@ -1,13 +1,16 @@
 <div align="center" text-align="center">
 	<br />
 	<img src="https://github.com/nuttmegg/discord.ps/blob/main/assets/logo%20white%20smaller.png">
+</div>
 
-Discord.PS is a combination of [Discord.JS](https://discord.js.org/) and [Discord.PY](https://github.com/Rapptz/discord.py) made in [Node.JS](https://nodejs.org/en/) to solve most of the annoying parts of Discord.JS and possibly welcome Discord.PY users into Node.JS.<br><br>
-*__THIS IS A VERY EARLY VERSION AND I WILL UPDATE IT OVER TIME__*<br>
+Discord.PS is a combination of [Discord.JS](https://discord.js.org/) and [Discord.PY](https://github.com/Rapptz/discord.py) made in [Node.JS](https://nodejs.org/en/) to solve most of the annoying parts of Discord.JS and possibly welcome Discord.PY users into Node.JS.
+
+<br>
+
+*__THIS IS A VERY EARLY VERSION AND I WILL UPDATE IT OVER TIME__*<br><br>
 
 for a full look at what it has to offer go check out the [wiki pages](https://github.com/nuttmegg/discord.ps/wiki)<br>
 for a look at some examples check out the [examples folder](https://github.com/TheFlameZEternal/Discord.PS/tree/main/examples)
-</div>
 <br>
 
 ## Installation
