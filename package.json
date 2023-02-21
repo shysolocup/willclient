@@ -9,16 +9,16 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/TheFlameZEternal/Discord.PS.git"
+        "url": "https://github.com/nuttmegg/Discord.PS.git"
     },
     "bugs": {
-        "url": "https://github.com/TheFlameZEternal/Discord.PS/issues"
+        "url": "https://github.com/nuttmegg/Discord.PS/issues"
     },
     "keywords": [
         "discord.js",
         "discord.ps",
         "discord"
     ],
-    "homepage": "https://github.com/TheFlameZEternal/Discord.PS",
+    "homepage": "https://github.com/nuttmegg/Discord.PS",
     "main": "./index.js"
 }
