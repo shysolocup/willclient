@@ -4,13 +4,13 @@
 	<br />
 	<img src="https://github.com/nuttmegg/discord.ps/blob/main/assets/logo_white.png">
 
-Discord.PS is a combination of [Discord.JS](https://discord.js.org/) and [Discord.PY](https://github.com/Rapptz/discord.py) made in [Node.JS](https://nodejs.org/en/) to solve most of the annoying parts of Discord.JS and possibly welcome Discord.PY users into Node.JS
+Discord+PS is a combination of [Discord.JS](https://discord.js.org/) and [Discord.PY](https://github.com/Rapptz/discord.py) made in [Node.JS](https://nodejs.org/en/) to solve most of the annoying parts of Discord.JS and possibly welcome Discord.PY users into Node.JS
 
 <br>
 
 *__THIS IS A VERY EARLY VERSION AND I WILL UPDATE IT OVER TIME__*<br><br>
 
-for a look at some examples check out the [examples folder](https://github.com/TheFlameZEternal/Discord.PS/tree/main/examples)<br>
+for a look at some examples check out the [examples folder](https://github.com/TheFlameZEternal/DiscordPS/tree/main/examples)<br>
 for a full look at everything go check out the [wiki pages](https://github.com/nuttmegg/discord.ps/wiki)
 
 </div>
@@ -23,25 +23,25 @@ for a full look at everything go check out the [wiki pages](https://github.com/n
 
 ## Installation
 ```console
-npm i discord.ps
+npm i discord+ps
 ```
 
 <br>
 
 ## Setting Up
 ### **Discord.JS Client**
-Discord.PS is built off of Discord.JS so for it to work you need Discord.JS.
+Discord+PS is built off of Discord.JS so for it to work you need Discord.JS.
 ```js
 const { Client } = require('discord.js');
 const client = new Client({
 	// your stuff here
 });
 ```
-### **Discord.PS Client**
-once you have your discord.js client you can add in Discord.PS.<br>
+### **Discord+PS Client**
+once you have your Discord.JS client you can add in Discord+PS.<br>
 *(prefix is optional)*
 ```js
-const { PSClient } = require('discord.ps');
+const { PSClient } = require('discord+ps');
 const psc = new PSClient({
 	client: client,
 	prefix: "!" 
