@@ -1,5 +1,3 @@
-/* THIS RELIES ON DISCORD.PS VERSION 0.5 WHICH IS NOT CURRENTLY AVAILABLE */
-
 const { Client } = require('discord.js');
 const client = new Client({ /* your stuff here */ });
 const { PSClient } = require('discordpps');
