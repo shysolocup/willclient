@@ -9,10 +9,10 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/nuttmegg/Discord.PS.git"
+        "url": "https://github.com/nuttmegg/discordpps.git"
     },
     "bugs": {
-        "url": "https://github.com/nuttmegg/Discord.PS/issues"
+        "url": "https://github.com/nuttmegg/discordpps/issues"
     },
     "keywords": [
         "discord.js",
@@ -20,6 +20,6 @@
         "discordpps",
         "discord"
     ],
-    "homepage": "https://github.com/nuttmegg/Discord.PS",
+    "homepage": "https://github.com/nuttmegg/discordpps",
     "main": "./index.js"
 }
