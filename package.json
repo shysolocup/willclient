@@ -1,5 +1,5 @@
 {
-    "name": "discord+ps",
+    "name": "discordpps",
     "version": "0.5.1",
     "author": "nutmeg",
     "description": "A combination of Discord.JS and Discord.PY made in Node.JS",
