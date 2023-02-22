@@ -2,7 +2,7 @@
 
 <div align="center" text-align="center">
 	<br />
-	<img src="https://github.com/nuttmegg/discord.ps/blob/main/assets/logo_white.png">
+	<img src="https://github.com/nuttmegg/discordpps/blob/main/assets/logo_white.png">
 
 Discord+PS is a combination of [Discord.JS](https://discord.js.org/) and [Discord.PY](https://github.com/Rapptz/discord.py) made in [Node.JS](https://nodejs.org/en/) to solve most of the annoying parts of Discord.JS and possibly welcome Discord.PY users into Node.JS
 
@@ -10,8 +10,8 @@ Discord+PS is a combination of [Discord.JS](https://discord.js.org/) and [Discor
 
 *__THIS IS A VERY EARLY VERSION AND I WILL UPDATE IT OVER TIME__*<br><br>
 
-for a look at some examples check out the [examples folder](https://github.com/TheFlameZEternal/DiscordPS/tree/main/examples)<br>
-for a full look at everything go check out the [wiki pages](https://github.com/nuttmegg/discord.ps/wiki)
+for a look at some examples check out the [examples folder](https://github.com/nuttmegg/discordpps/tree/main/examples)<br>
+for a full look at everything go check out the [wiki pages](https://github.com/nuttmegg/discordpps/wiki)
 
 </div>
 
@@ -23,7 +23,7 @@ for a full look at everything go check out the [wiki pages](https://github.com/n
 
 ## Installation
 ```console
-npm i discord+ps
+npm i discordpps
 ```
 
 <br>
@@ -41,7 +41,7 @@ const client = new Client({
 once you have your Discord.JS client you can add in Discord+PS.<br>
 *(prefix is optional)*
 ```js
-const { PSClient } = require('discord+ps');
+const { PSClient } = require('discordpps');
 const psc = new PSClient({
 	client: client,
 	prefix: "!" 
