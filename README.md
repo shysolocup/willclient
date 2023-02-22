@@ -3,6 +3,12 @@
 <div align="center" text-align="center">
 	<br />
 	<img src="https://github.com/nuttmegg/discordpps/blob/main/assets/logo_white.png">
+	<br />
+	<a href="https://www.npmjs.com/package/discordpps"><img src="https://img.shields.io/npm/v/discordpps?style=flat&color=red&logo=npm&logoColor=white" alt="package version" />
+	<a href="https://discord.js.org/"><img src="https://img.shields.io/badge/discord.js-v14.7.1-blue?style=flat&color=7289da&logo=discord&logoColor=white" alt="discord.js version" /></a>
+	<a href="https://github.com/nuttmegg/discordpps/discussions"><img src="https://img.shields.io/github/discussions/nuttmegg/discordpps?logo=wechat&logoColor=white" alt="discussions" />
+	<a href="https://github.com/nuttmegg/discordpps/issues"><img src="https://img.shields.io/github/issues/nuttmegg/discordpps" alt="issues" />
+	
 
 Discord+PS is a combination of [Discord.JS](https://discord.js.org/) and [Discord.PY](https://github.com/Rapptz/discord.py) made in [Node.JS](https://nodejs.org/en/) to solve most of the annoying parts of Discord.JS and possibly welcome Discord.PY users into Node.JS
 
