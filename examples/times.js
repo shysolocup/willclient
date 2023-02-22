@@ -1,6 +1,6 @@
 const { Client } = require('discord.js');
 const client = new Client({ /* your stuff here */ });
-const { PSClient } = require('discord.ps');
+const { PSClient } = require('discordpps');
 const psc = new PSClient({ client: discordClient, prefix: "." });
 
 const config = require('./config.json');
