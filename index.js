@@ -1,7 +1,7 @@
-/* :: Discord.PS :: Version 0.5.0 | 02/21/23 :: */
+/* :: Discord+PS :: Version 0.5.1 | 02/22/23 :: */
 
 /* Made by nutmeg using elements of the NutFL function library.
-	  === https://github.com/TheFlameZEternal/nutfl ===
+	  === https://github.com/nuttmegg/nutfl ===
    
 	Note: Blame any weird indents on github lol
 	
