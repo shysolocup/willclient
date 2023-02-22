@@ -1,5 +1,5 @@
 {
-    "name": "discord.ps",
+    "name": "discord+ps",
     "version": "0.5.1",
     "author": "nutmeg",
     "description": "A combination of Discord.JS and Discord.PY made in Node.JS",
@@ -17,6 +17,7 @@
     "keywords": [
         "discord.js",
         "discord.ps",
+        "discord+ps",
         "discord"
     ],
     "homepage": "https://github.com/nuttmegg/Discord.PS",
