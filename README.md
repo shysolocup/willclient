@@ -25,7 +25,6 @@ for a full look at everything go check out the [wiki pages](https://github.com/n
 ```console
 npm i nuttmegg/discord.ps
 ```
-*⬇⬇ This one is not currently available ⬇⬇*
 ```console
 npm i discord.ps
 ```
