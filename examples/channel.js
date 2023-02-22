@@ -34,7 +34,7 @@ psc.command( {name: "lock", aliases: ["lockdown"]}, async (ctx, cmd) => {
 psc.command( {name: "unlock", aliases: ["unlockdown"]}, async (ctx, cmd) => {
     let channel = (cmd.args.length > 0) ? psc.fetchChannel(cmd.args[0]) : ctx.channel;
     
-    if (psc.user.hasPermissions(["manageMessages"]) {
+    if (psc.user.hasPermissions(["manageChannels"]) {
         psc.channel.unlock(channel);
     
         ctx.channel.send(`Unlocked ${channel.name}!`);
