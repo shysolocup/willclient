@@ -1,7 +1,7 @@
 name: publish my shit
 on:
   release:
-    types: [published, updated]
+    types: [published]
 jobs:
   build:
     runs-on: ubuntu-latest
