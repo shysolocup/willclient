@@ -12,7 +12,7 @@
 	<a href="https://github.com/nuttmegg/discordpps/issues"><img src="https://img.shields.io/github/issues/nuttmegg/discordpps" alt="issues" />
 	
 
-Discord+PS is a combination of [Discord.JS](https://discord.js.org/) and [Discord.PY](https://github.com/Rapptz/discord.py) made in [Node.JS](https://nodejs.org/en/) to solve most of the annoying parts of Discord.JS and possibly welcome Discord.PY users into Node.JS
+Discord+PS is a combination of [Discord.JS](https://discord.js.org/) and [Discord.PY](https://github.com/Rapptz/discord.py) made in [Node.JS](https://nodejs.org/en/) to solve most of the annoying parts of Discord.JS and possibly welcome users into Node.JS
 
 <br>
 
@@ -28,10 +28,54 @@ for a full look at everything go check out the [wiki pages](https://github.com/n
 ---
 
 <br>
+		
+## Usage
+Discord+PS simplifies prefix commands and is heavily inspried by the design and functionality of Discord.PY while still being made with Discord.JS
+```js
+// discord+ps
+psc.command( {name: "ping"}, async (ctx) => {
+	await ctx.reply("Pong!");		
+});
+```
+```py
+# discord.py
+@bot.command()
+async def ping(ctx):
+	await ctx.reply("Pong!")
+```
+It also has aliases for commands
+```js
+// works with avatar or av
+psc.command( {name: "avatar", aliases: ["av"]}, (ctx) => {
+	ctx.reply(psc.user.avatar(ctx.author));	
+});
+```
+It has built in arguments or parameters whatever you prefer to call them that you can use
+```js
+// tagify <@id> or id
+psc.command( {name: "tagify"}, (ctx, cmd) => {
+	let user = psc.fetchUser(cmd.args[0]);
+	
+	ctx.reply(user.tag);
+});
+```
+And built in cooldowns
+```js
+psc.command( {name: "ping", cooldown: "30s"}, (ctx, cmd) => {
+	if (cmd.onCooldown) return psc.reply("Command is on cooldown!", {deleteAfter: "3s"});
+	
+	ctx.reply("Pong!");
+});
+```
+		
+<br>
 
 ## Installation
 ```console
 npm i discordpps
+```
+```console
+npm i nuttmegg/discordpps
 ```
 
 <br>
