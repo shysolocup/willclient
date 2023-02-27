@@ -2,7 +2,7 @@
     "name": "discordpps",
     "version": "0.5.2",
     "author": "nutmeg",
-    "description": "A combination of Discord.JS and Discord.PY made in Node.JS",
+    "description": "A JavaScript package meant to make storing info easier.",
     "dependencies": {
         "discord.js": "latest",
         "@discordjs/voice": "latest"
