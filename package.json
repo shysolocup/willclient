@@ -5,7 +5,8 @@
     "description": "A combination of Discord.JS and Discord.PY made in Node.JS",
     "dependencies": {
         "discord.js": "latest",
-        "@discordjs/voice": "latest"
+        "@discordjs/voice": "latest",
+        "stews": "latest"
     },
     "repository": {
         "type": "git",
