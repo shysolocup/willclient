@@ -116,6 +116,7 @@
 "newInteraction": "interactionCreate",
 "shardDisconnect": "shardDisconnect",
 "shardError": "shardError",
+"error": "shardError",
 "shardReady": "shardReady",
 "shardReconnecting": "shardReconnecting",
 "shardResume": "shardResume",
