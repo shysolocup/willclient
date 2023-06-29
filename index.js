@@ -65,13 +65,13 @@ class PSClient {
 		files.forEach(action);
 	}
 
-	compile(path, ignore=["index.js"], action=(file) => { require(`../../${path}/${file}`) }) {
+	compile(path, ignore=["index.js"]) {
 		let files = fs.readdirSync(`${path}`).filter(file => (file.endsWith('.js') && !ignore.includes(file) ));
 		let stuff = new Soup(Object);
 		
 		files.forEach( (file) => {
 			let name = file.split(".js")[0];
-			stuff.push(name, action(file));
+			stuff.push(name, require(`../../${path}/${file}`));
 		});
 
 		return stuff;
