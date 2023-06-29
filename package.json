@@ -1,6 +1,6 @@
 {
-    "name": "discordpps",
-    "version": "0.5.2",
+    "name": "psc",
+    "version": "0.6.0",
     "author": "nutmeg",
     "description": "A combination of Discord.JS and Discord.PY made in Node.JS",
     "dependencies": {
@@ -10,17 +10,17 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/nuttmegg/discordpps.git"
+        "url": "https://github.com/nuttmegg/psc.git"
     },
     "bugs": {
-        "url": "https://github.com/nuttmegg/discordpps/issues"
+        "url": "https://github.com/nuttmegg/psc/issues"
     },
     "keywords": [
         "discord.js",
-        "discordpps",
-        "discordps",
-        "discord"
+        "discord.py",
+        "discord",
+        "psc"
     ],
-    "homepage": "https://github.com/nuttmegg/discordpps",
+    "homepage": "https://github.com/nuttmegg/psc",
     "main": "./index.js"
 }
