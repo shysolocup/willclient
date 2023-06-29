@@ -64,6 +64,16 @@ class PSClient {
 		let files = fs.readdirSync(`${path}`).filter(file => (file.endsWith('.js') && !ignore.includes(file) ));
 		files.forEach(action);
 	}
+
+	compile(path, ignore=["index.js"], action=(file) => { require(`../../${path}/${file}`) }) {
+		let files = fs.readdirSync(`${path}`).filter(file => (file.endsWith('.js') && !ignore.includes(file) ));
+		let stuff = new Soup();
+		
+		files.forEach( (file) => {
+			let name = file.split(".js")[0];
+			stuff.push(name, action);
+		});
+	}
     
     
     /* variables */
