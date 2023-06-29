@@ -70,7 +70,7 @@ class PSClient {
 		let stuff = new Soup(Object);
 		
 		files.forEach( (file) => {
-			let name = (file.endsWith(".js")) ? file.split(".js")[0] : (file.endsWith(".json")) ? file.split(".json") : file;
+			let name = (file.endsWith(".js")) ? file.split(".js")[0] : (file.endsWith(".json")) ? file.split(".json")[0] : file;
 			stuff.push(name, require(`../../${path}/${file}`));
 		});
 
