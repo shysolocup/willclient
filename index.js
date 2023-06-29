@@ -73,6 +73,8 @@ class PSClient {
 			let name = file.split(".js")[0];
 			stuff.push(name, action);
 		});
+
+		return stuff;
 	}
     
     
