@@ -1,25 +1,15 @@
-/* :: Discord+PS :: Version 0.5.2 | 02/23/23 :: */
+/* :: Discord+PS :: Version 0.6.0 | 06/29/23 :: */
 
-/* Made by nutmeg using elements of the NutFL function library.
-	  === https://github.com/nuttmegg/nutfl ===
-   
-	Note: Blame any weird indents on github lol
-	
+/* :: Created by nutmeg using :: *//*
+	- Stews: https://github.com/nuttmegg/stews
+	- NutFL: https://github.com/nuttmegg/nutfl
 */
 
 const { ActivityType } = require('discord.js');
 const voice = require('@discordjs/voice');
+const { Stew, Soup, random } = require('stews');
+var fs = require('fs');
 
-
-Array.prototype.remove = function(int) {
-	const [res, o] = [ [], this];
-	const length = o.length;
-	for (let i = 0; i < length; i++) {
-		if (i < int || i > int) { res.push(this.shift()); }
-		if (i == int) { this.shift(); }
-	}
-	return res;
-};
 
 String.prototype.colorFormat = function() {
 	if (this.startsWith("#")) { var a = this.replace("#", "0x"); return parseInt(a); } else { return 0x5865F2; }
@@ -29,16 +19,8 @@ Object.defineProperty(String.prototype, "block", {
 	get() { return "`"+this+"`" }, set(){}
 });
 
-Object.defineProperty(String.prototype, "italic", {
-	get() { return `*${this}*`; }, set(){}
-});
-
 Object.defineProperty(String.prototype, "bold", {
 	get() { return `**${this}**`; }, set(){}
-});
-
-Object.defineProperty(String.prototype, "underline", {
-	get() { return `__${this}__`; }, set(){}
 });
 
 Object.defineProperty(String.prototype, "linethrough", {
@@ -77,10 +59,15 @@ class PSClient {
     setClient(client) {
         this.client = client;
     }
+
+	build(path, ignore=["index.js"], action=(file) => { require(`../${path}/${file}`) }) {
+		let files = fs.readdirSync(`${path}`).filter(file => (file.endsWith('.js') && !ignore.includes(file) ));
+		files.forEach(action);
+	}
     
     
     /* variables */
-    commandList = [];
+    commandList = new Stew(Object);
 	handlerActive = false;
 	
 	globalCooldown = {
@@ -107,11 +94,30 @@ class PSClient {
 	};
 	
 	setCooldown(time) {
+		time = this.time.parse(time);
+
 		if (typeof time != "number") {
 			throw new CoolError("Global Cooldown", "Cooldown has to be an integer (seconds)");
 		}
-		this.globalCooldown.time = time;
+
+		this.globalCooldown.time = time
+		this.globalCooldown.timestamp = this.time.set.relative( Math.abs(this.time.parse(time)*1000 + (Date.now())) );
 		this.globalCooldown.active = true;
+
+		Object.defineProperties(this.globalCooldown, {
+			relative: { get() {
+				var [psc, client, ctx] = Holder;
+				let now = parseInt(psc.time.now.relative.split(":")[1]);
+				let raw = Math.abs( time + parseInt(now) );
+				return `<t:${raw}:R>`;
+			}},
+			
+			raw: { get() {
+				var [psc, client, ctx] = Holder;
+				let now = parseInt(psc.time.now.relative.split(":")[1]);
+				return Math.abs( time + parseInt(now) );
+			}}
+		});
 	}
 	
 	deleteCooldown() {
@@ -123,6 +129,11 @@ class PSClient {
     command(info={name:null, aliases:null, cooldown:null}, data) {
 		if (!this.handlerActive) { this.handlerActive = true; ClientHandler(this, this.client); }
 
+		if (typeof info == "string") {
+			let thing = info;
+			info = { name: thing, aliases: null, cooldown: null};
+		}
+		
 		var [name, aliases] = [info.name, info.aliases];
 		
 		if (info.cooldown && typeof info.cooldown == "number") { var time = info.cooldown; }
@@ -143,8 +154,21 @@ class PSClient {
     			data: new Set(),
     			active: true,
     			time: time,
+				
+				get relative() {
+					var [psc, client, ctx] = Holder;
+					let now = parseInt(psc.time.now.relative.split(":")[1]);
+					let raw = Math.abs( info.cooldown.time + parseInt(now) );
+					return `<t:${raw}:R>`;
+				},
+				
+				get raw() {
+					var [psc, client, ctx] = Holder;
+					let now = parseInt(psc.time.now.relative.split(":")[1]);
+					return Math.abs( info.cooldown.time + parseInt(now) );
+				},
     			
-    			handle: function(user=null) {
+    			handle(user=null) {
 					var [psc, client, ctx] = Holder;
 
 					user = (user) ? user : ctx.author;
@@ -156,14 +180,14 @@ class PSClient {
         			}
     			},
     			
-    			fetch: function(user=null) {
+    			fetch(user=null) {
 					var [psc, client, ctx] = Holder;
 					return (this.data.has( (user) ? user.id : ctx.author.id )) ? true : false;
     			}
 			};
 		}
-        let newCMD = {"info": info, "data": data};
-        this.commandList.push(newCMD);
+        let newCMD = {"info": Soup.from(info), "data": data};
+        this.commandList.push(info.name, newCMD);
 		return newCMD;
     }
 
@@ -171,8 +195,8 @@ class PSClient {
 		var exists;
 		try {
         	for (let i = 0; i < this.commandList.length; i++) {
-        	    let info = this.commandList[i].info;
-        		if (info.name == name || (info.aliases && info.aliases.includes(name)) ) { throw true; }
+        	    let info = this.commandList.get(i).info;
+        		if (info.get("name") == name || (info.get("aliases") && info.get("aliases").includes(name)) ) { throw true; }
         	}
         	throw false;
         	
@@ -187,8 +211,8 @@ class PSClient {
         var index;
         try {
         	for (let i = 0; i < this.commandList.length+1; i++) {
-        	    var info = this.commandList[i].info;
-        		if (info.name == name || (info.aliases && info.aliases.includes(name)) ) { throw i; }
+        	    var info = this.commandList.get(i).info;
+        		if (info.get("name") == name || (info.get("aliases") && info.get("aliases").includes(name)) ) { throw i; }
         	}
         	throw null;
         	
@@ -197,12 +221,12 @@ class PSClient {
             else index = has;
         }
         
-        let command = this.commandList[index];
-
+        let command = this.commandList.get(index);
+		
 		let returns = {
-			name: command.info.name,
-			aliases: command.info.aliases,
-			cooldown: command.info.cooldown,
+			name: command.info.get("name"),
+			aliases: command.info.get("aliases"),
+			cooldown: command.info.get("cooldown"),
 			data: command.data
 		};
         
@@ -232,38 +256,48 @@ class PSClient {
 			this.globalCooldown.handle();
     	}
 		else {
-			cooldown = null;
+			cooldown = {};
 			onCooldown = false;
 			cooldownType = null;
 		}
     	
     	cmd.onCooldown = (onCooldown) ? onCooldown : false;
 		cmd.cooldownType = (cooldownType) ? cooldownType : null;
-		cmd.cooldown = (cooldown) ? cooldown : null;
+		cmd.cooldown = (cooldown) ? cooldown : {};
     	
     	return command.data(ctx, cmd);
     }
     
     executeCMD(name, ctx, cmd=null) { return this.executeCommand(name, ctx, cmd); }
 
-	commandFormat(string) {
+	commandFormat(string, prefix) {
 		let res = {};
-		let pos = (this.prefix)
-			? string.toLowerCase().indexOf(this.prefix.toLowerCase())
+		let pos = (prefix)
+			? string.toLowerCase().indexOf(prefix.toLowerCase())
 		: 0;
 		
-		res["name"] = (this.prefix)
-			? string.toLowerCase().replace(this.prefix.toLowerCase(), "").split(" ")[pos]
+		res["name"] = (prefix)
+			? string.toLowerCase().replace(prefix.toLowerCase(), "").split(" ")[pos]
 		: string.toLowerCase().split(" ")[pos];
+
+		let soup = new Soup(string.split(" "));
+
+		delete soup[pos];
 		
-		res["args"] = string.split(" ").remove(pos);
+		res["args"] = soup.pour();
 		
 		return res;
 	}
 
 	commandHandler(ctx) {
-		if (this.prefix && (!ctx.content.startsWith(this.prefix) || ctx.content.endsWith(this.prefix) && ctx.content.startsWith(this.prefix))) return;
-		let cmd = this.commandFormat(ctx.content);
+		if (ctx.author.bot || ctx.author.id == this.client.user.id) return;
+		
+		let prefix = (this.prefix instanceof Object && this.prefix[ctx.guild.id] ) ? this.prefix[ctx.guild.id] : (this.prefix instanceof Object) ? this.prefix.default : this.prefix;
+		
+		if (prefix && (!ctx.content.startsWith(prefix) || (ctx.content.endsWith(prefix) && ctx.content.startsWith(prefix)))) return;
+		
+		let cmd = this.commandFormat(ctx.content, prefix);
+		
 		if (this.commandExists(cmd.name)) {
 			this.executeCommand(cmd.name, ctx, cmd);
 		}
@@ -457,7 +491,7 @@ class PSClient {
 	
 	selectionAction(func) {
 		this.client.on("interactionCreate", (ctx) => {
-			if (ctx.isSelectMenu()) {
+			if (ctx.isStringSelectMenu()) {
 				return func(ctx);
 			}
 		});
@@ -465,7 +499,7 @@ class PSClient {
 
 	selectMenuAction(func) {
 		this.client.on("interactionCreate", (ctx) => {
-			if (ctx.isSelectMenu()) {
+			if (ctx.isStringSelectMenu()) {
 				return func(ctx);
 			}
 		});
@@ -473,7 +507,7 @@ class PSClient {
 	
 	rowAction(func) {
 		this.client.on("interactionCreate", (ctx) => {
-			if (ctx.isButton() || ctx.isSelectMenu()) {
+			if (ctx.isButton() || ctx.isStringSelectMenu()) {
 				return func(ctx);
 			}
 		});
@@ -622,20 +656,63 @@ class PSClient {
 	
 
 	/* fetches */
-	fetchUser(id) { if (!id) return null; let mention = id; if (mention.startsWith('<@') && mention.endsWith('>')) {mention = mention.slice(2, -1); if (mention.startsWith('!')) {mention = mention.slice(1); }} mention = mention.split("").join(""); let user = this.client.users.cache.get(mention); return (!user) ? null : user; }
+	fetchUser(id) { if (!id) return null; let mention = id; if (mention.startsWith('<@') && mention.endsWith('>')) {mention = mention.slice(2, -1); if (mention.startsWith('!')) {mention = mention.slice(1); }} mention = mention.split("").join(""); let user = this.client.users.fetch(mention).catch(e=>{}); return (!user) ? null : user; }
 	fetchMember(id) { return this.fetchUser(id); }
 	
-	fetchGuildUser(id, guild=null) { if (!id) return null; var [psc, client, ctx] = Holder; let mention = id; if (mention.startsWith('<@') && mention.endsWith('>')) {mention = mention.slice(2, -1); if (mention.startsWith('!')) {mention = mention.slice(1); }} mention = mention.split("").join(""); let user = (guild) ? guild.members.fetch(mention) : ctx.guild.members.fetch(mention); return (!user) ? null : user; }
+	fetchGuildUser(id, guild=null) { if (!id) return null; var [psc, client, ctx] = Holder; let mention = id; if (mention.startsWith('<@') && mention.endsWith('>')) {mention = mention.slice(2, -1); if (mention.startsWith('!')) {mention = mention.slice(1); }} mention = mention.split("").join(""); let user = (guild) ? guild.members.fetch(mention).catch(e=>{}) : ctx.guild.members.fetch(mention).catch(e=>{}); return (!user) ? null : user; }
 	fetchGuildMember(id, guild=null) { return this.fetchGuildUser(id, guild); }
 	
-	fetchChannel(id) { if (!id) return null; let rawChannel = id; if (rawChannel.startsWith('<#') && rawChannel.endsWith('>')) {rawChannel = rawChannel.slice(2, -1); } rawChannel = rawChannel.split("").join(""); let channel = this.client.channels.cache.get(rawChannel); return (!channel) ? null : channel; }
+	fetchChannel(id) { if (!id) return null; let rawChannel = id; if (rawChannel.startsWith('<#') && rawChannel.endsWith('>')) {rawChannel = rawChannel.slice(2, -1); } rawChannel = rawChannel.split("").join(""); let channel = this.client.channels.fetch(rawChannel).catch(e=>{}); return (!channel) ? null : channel; }
 
-	fetchGuildChannel(id, guild=null) { if (!id) return null; var [psc, client, ctx] = Holder; let rawChannel = id; if (rawChannel.startsWith('<#') && rawChannel.endsWith('>')) {rawChannel = rawChannel.slice(2, -1); } rawChannel = rawChannel.split("").join(""); let channel = (guild) ? guild.channels.fetch(rawChannel) : ctx.guild.channels.fetch(rawChannel); return (!channel) ? null : channel; }
+	fetchGuildChannel(id, guild=null) { if (!id) return null; var [psc, client, ctx] = Holder; let rawChannel = id; if (rawChannel.startsWith('<#') && rawChannel.endsWith('>')) {rawChannel = rawChannel.slice(2, -1); } rawChannel = rawChannel.split("").join(""); let channel = (guild) ? guild.channels.fetch(rawChannel).catch(e=>{}) : ctx.guild.channels.fetch(rawChannel).catch(e=>{}); return (!channel) ? null : channel; }
 
-	fetchRole(id, guild=null) { if (!id) return null; var [psc, client, ctx] = Holder; let rawRole = id; if (rawRole.startsWith('<@') && rawRole.endsWith('>')) {rawRole = rawRole.slice(2, -1); if (rawRole.startsWith('&')) {rawRole = rawRole.slice(1); }} rawRole = rawRole.split("").join(""); let role = (guild) ? guild.roles.fetch(rawRole) : ctx.guild.roles.fetch(rawRole); return (!role) ? null : role; }
+	fetchRole(id, guild=null) { if (!id) return null; var [psc, client, ctx] = Holder; let rawRole = id; if (rawRole.startsWith('<@') && rawRole.endsWith('>')) {rawRole = rawRole.slice(2, -1); if (rawRole.startsWith('&')) {rawRole = rawRole.slice(1); }} rawRole = rawRole.split("").join(""); let role = (guild) ? guild.roles.fetch(rawRole).catch(e=>{}) : ctx.guild.roles.fetch(rawRole).catch(e=>{}); return (!role) ? null : role; }
 	fetchGuildRole(id, guild=null) { return this.fetchRole(id, guild); }
 	
-	fetchGuild(id) { if (!id) return null; let guild = this.client.guilds.cache.get(id); return (!guild) ? null : guild; }
+	fetchGuild(id) { if (!id) return null; let guild = this.client.guilds.fetch(id).catch(e=>{}); return (!guild) ? null : guild; }
+
+	fetchMessage(id, channel=null) { if (!id) return null; var [psc, client, ctx] = Holder; let message = (channel) ? channel.messages.fetch(id).catch(e=>{}) : ctx.channel.messages.fetch(id).catch(e=>{}); return (!message) ? null : message; }
+
+	fetchReply(message=null) { var [psc, client, ctx] = Holder; let msg = (message) ? message : ctx; let reply = (msg.reference) ? msg.channel.messages.fetch(msg.reference.messageId).catch(e=>{}) : null; return (!reply) ? null : reply; }
+	
+	parseEmoji(emoji) { 
+		if (!emoji) return null;
+		var emojiInfo = {};
+
+		if ((emoji.startsWith("<:") || emoji.startsWith("<a:")) && emoji.endsWith(">")) {
+			var animated = (emoji.startsWith("<:") || emoji.startsWith(":")) ? false : true;
+			
+			emoji = emoji.slice(2, -1);
+			
+			if (emoji.startsWith(":")) { emoji = emoji.split(""); emoji.shift(); emoji = emoji.join(""); }
+
+			if (emoji.includes(":")) {
+				emoji = emoji.split(":");
+
+				emojiInfo.name = emoji[0];
+				emojiInfo.id = emoji[1];
+			}
+
+			emojiInfo.animated = animated
+			emojiInfo.url = `https://cdn.discordapp.com/emojis/${emojiInfo.id}.${ (animated) ? "gif" : "png" }`;
+
+			return emojiInfo;
+		}
+	}
+	
+	parseSticker(sticker) {
+		if (!sticker) return null;
+
+		let thing = {
+			id: sticker.id,
+			name: sticker.name,
+			description: sticker.description,
+			animated: (sticker.format == 2) ? true : false,
+			url: `https://cdn.discordapp.com/stickers/${sticker.id}.png`
+		};
+
+		return thing;
+	}
 
 	
 	/* sleeps */
@@ -649,6 +726,7 @@ class PSClient {
 		number(min, max) {
 			return Math.floor(Math.random() * (max - min + 1) ) + min;
 		}
+		int(min, max) { return this.number(min, max); }
 
 		choice(array) {
 			return array[Math.floor(Math.random() * (Number(array.length)))];
@@ -695,117 +773,118 @@ class PSClient {
     		else if (thing == "y") { return parseFloat(t.join(""))*60*60*24*365; }
     		else { return parseFloat(string); }
 		}
+		format(string) {
+    		let t = string.split("");
+    		let thing = t.pop();
+    
+    		if (thing == "s") { return `${t.join("")} seconds`; }
+			else if (thing == "ms") { return `${t.join("")} milliseconds`; }
+    		else if (thing == "m") { return `${t.join("")} minutes`; }
+    		else if (thing == "h") { return `${t.join("")} hours`; }
+    		else if (thing == "d") { return `${t.join("")} days`; }
+    		else if (thing == "w") { return `${t.join("")} weeks`; }
+    		else if (thing == "y") { return `${t.join("")} years`; }
+		}
 	}
 	date = this.time;
+	times = this.time;
 	
 	
 	/* voice */
 	voice = new class {
-		fetch(user, func) {
+		fetch = async function(user, guild=null) {
 			var [psc, client, ctx] = Holder;
-			psc.guild.channelF( (channels) => {
-				channels.forEach( (channel) => {
-					if (channel.members.has(user.id) && channel.type == 2) {
-						return func(channel);
-					}
-				});
-			});
+			let vcs = await psc.guild.VCs(guild);
+			for (let i = 0; i < vcs.length; i++) {
+				let channel = vcs[i];
+
+				if (channel.members.has(user.id)) return channel;
+			}
+			return null;
 		}
 		find(user, func) { return this.fetch(user, func); }
 		
-		mute(user) {
+		mute = async function(user, guild=null) {
 			var [psc, client, ctx] = Holder;
-			psc.guild.channelF( (channels) => {
-				channels.forEach( (channel) => {
-					if (channel.members.has(user.id) && channel.type == 2) {
-						let vcUser = channel.members.get(user.id);
-						vcUser.voice.setMute(true);
-					}
-				});
-			});
+			let channel = await psc.voice.fetch(user, guild);
+
+			if (channel.members.has(user.id)) {
+				let vcUser = channel.members.get(user.id);
+				vcUser.voice.setMute(true);
+			}
 		}
 
-		unmute(user) {
+		unmute = async function(user, guild=null) {
 			var [psc, client, ctx] = Holder;
-			psc.guild.channelF( (channels) => {
-				channels.forEach( (channel) => {
-					if (channel.members.has(user.id) && channel.type == 2) {
-						let vcUser = channel.members.get(user.id);
-						vcUser.voice.setMute(false);
-					}
-				});
-			});
+			let channel = await psc.voice.fetch(user, guild);
+
+			if (channel.members.has(user.id)) {
+				let vcUser = channel.members.get(user.id);
+				vcUser.voice.setMute(false);
+			}
 		}
 
-		deafen(user) {
+		deafen = async function(user, guild=null) {
 			var [psc, client, ctx] = Holder;
-			psc.guild.channelF( (channels) => {
-				channels.forEach( (channel) => {
-					if (channel.members.has(user.id) && channel.type == 2) {
-						let vcUser = channel.members.get(user.id);
-						vcUser.voice.setDeaf(true);
-					}
-				});
-			});
+			let channel = await psc.voice.fetch(user, guild);
+
+			if (channel.members.has(user.id)) {
+				let vcUser = channel.members.get(user.id);
+				vcUser.voice.setDeaf(true);
+			}
 		}
 
-		undeafen(user) {
+		undeafen = async function(user, guild=null) {
 			var [psc, client, ctx] = Holder;
-			psc.guild.channelF( (channels) => {
-				channels.forEach( (channel) => {
-					if (channel.members.has(user.id) && channel.type == 2) {
-						let vcUser = channel.members.get(user.id);
-						vcUser.voice.setDeaf(false);
-					}
-				});
-			});
+			let channel = await psc.voice.fetch(user, guild);
+
+			if (channel.members.has(user.id)) {
+				let vcUser = channel.members.get(user.id);
+				vcUser.voice.setDeaf(false);
+			}
 		}
 
-		lockUser(user) {
+		lockUser = async function(user, guild=null) {
 			var [psc, client, ctx] = Holder;
-			psc.guild.channelF( (channels) => {
-				channels.forEach( (channel) => {
-					if (channel.members.has(user.id) && channel.type == 2) {
-						let vcUser = channel.members.get(user.id);
-						vcUser.voice.setMute(true);
-						vcUser.voice.setDeaf(true);
-					}
-				});
-			});
+			let channel = await psc.voice.fetch(user, guild);
+
+			if (channel.members.has(user.id)) {
+				let vcUser = channel.members.get(user.id);
+				vcUser.voice.setMute(true);
+				vcUser.voice.setDeaf(true);
+			}
 		}
 
-		unlockUser(user) {
+		unlockUser = async function(user, guild=null) {
 			var [psc, client, ctx] = Holder;
-			psc.guild.channelF( (channels) => {
-				channels.forEach( (channel) => {
-					if (channel.members.has(user.id) && channel.type == 2) {
-						let vcUser = channel.members.get(user.id);
-						vcUser.voice.setMute(false);
-						vcUser.voice.setDeaf(false);
-					}
-				});
-			});
+			let channel = await psc.voice.fetch(user, guild);
+
+			if (channel.members.has(user.id)) {
+				let vcUser = channel.members.get(user.id);
+				vcUser.voice.setMute(false);
+				vcUser.voice.setDeaf(false);
+			}
 		}
 		
-		lock(channel) {
+		lock = async function(channel, guild=null) {
 			var [psc, client, ctx] = Holder;
-			let vc = client.channels.cache.get(channel.id);
+			let vc = (guild) ? await ctx.guild.channels.fetch(channel.id) : await ctx.guild.channels.fetch(channel.id);
 			vc.members.forEach( (user) => {
 				user.voice.setMute(true); 
 				user.voice.setDeaf(true);
 			});
 		}
 
-		unlock(channel) {
+		unlock = async function(channel, guild=null) {
 			var [psc, client, ctx] = Holder;
-			let vc = client.channels.cache.get(channel.id);
+			let vc = (guild) ? await ctx.guild.channels.fetch(channel.id) : await ctx.guild.channels.fetch(channel.id);
 			vc.members.forEach( (user) => {
-				user.voice.setMute(false);
+				user.voice.setMute(false); 
 				user.voice.setDeaf(false);
 			});
 		}
 		
-		join(channel) {
+		join = async function(channel) {
 			voice.joinVoiceChannel({
             	channelId: channel.id,
             	guildId: channel.guild.id,
@@ -813,7 +892,7 @@ class PSClient {
         	});
 		}
 		
-		leave(channel) {
+		leave = async function(channel) {
 			const connection = voice.getVoiceConnection(channel.guild.id);
 			try { connection.destroy(); } catch(err) {}
 		}
@@ -821,209 +900,201 @@ class PSClient {
 	
 	/* guild */
 	guild = new class {
-		memberCount(guild=null) {
-			var [psc, client, ctx] = Holder; return (guild) ? guild.memberCount : ctx.guild.memberCount;
+		memberCount = async function(guild=null) {
+			var [psc, cilent, ctx] = Holder;
+			let stuff = await psc.guild.members(guild);
+			return stuff.length;
+		}
+
+		userCount = async function(guild=null) {
+			var [psc, cilent, ctx] = Holder;
+			let stuff = await psc.guild.users(guild);
+			return stuff.length;
+		}
+
+		botCount = async function(guild=null) {
+			var [psc, cilent, ctx] = Holder;
+			let stuff = await psc.guild.bots(guild);
+			return stuff.length;
 		}
 		
-		roleCount(guild=null) {
-			var [psc, cilent, ctx] = Holder; return (guild) ? guild.roles.cache.size : ctx.guild.roles.cache.size;
+		roleCount = async function(guild=null) {
+			var [psc, cilent, ctx] = Holder;
+			let stuff = await psc.guild.roles(guild);
+			return stuff.length;
+		}
+
+		stuffCount = async function(guild=null) {
+			var [psc, cilent, ctx] = Holder;
+			let stuff = await psc.guild.stuff(guild);
+			return stuff.length;
 		}
 		
-		channelCount(guild=null) {
-			var [psc, client, ctx] = Holder; return (guild) ? guild.channels.cache.size : ctx.guild.channels.cache.size;
+		channelCount = async function(guild=null) {
+			var [psc, cilent, ctx] = Holder;
+			let stuff = await psc.guild.channels(guild);
+			return stuff.length;
+		}
+
+		textChannelCount = async function(guild=null) {
+			var [psc, cilent, ctx] = Holder;
+			let stuff = await psc.guild.textChannels(guild);
+			return stuff.length;
+		}
+		TCCount = async function(guild=null) { return this.textChannelCount(guild); }
+
+		voiceChannelCount = async function(guild=null) {
+			var [psc, cilent, ctx] = Holder;
+			let stuff = await psc.guild.voiceChannels(guild);
+			return stuff.length;
+		}
+		VCCount = async function(guild=null) { return this.voiceChannelCount(guild); }
+
+		threadChannelCount = async function(guild=null) {
+			var [psc, cilent, ctx] = Holder;
+			let stuff = await psc.guild.threadChannels(guild);
+			return stuff.length;
+		}
+		threadCount = async function(guild=null) { return this.threadChannelCount(guild); }
+
+		categoryCount = async function(guild=null) {
+			var [psc, cilent, ctx] = Holder;
+			let stuff = await psc.guild.categories(guild);
+			return stuff.length;
 		}
 		
-		emojiCount(guild=null) {
-			var [psc, client, ctx] = Holder; return (guild) ? guild.emojis.cache.size : ctx.guild.emojis.cache.size;
+		emojiCount = async function(guild=null) {
+			var [psc, cilent, ctx] = Holder;
+			let stuff = await psc.guild.emojis(guild);
+			return stuff.length;
 		}
 		
-		stickerCount(guild=null) {
-			var [psc, client, ctx] = Holder; return (guild) ? guild.stickers.cache.size : ctx.guild.stickers.cache.size;
+		stickerCount = async function(guild=null) {
+			var [psc, cilent, ctx] = Holder;
+			let stuff = await psc.guild.stickers(guild);
+			return stuff.length;
 		}
 
-		members(func, guild=null) {
+		members = async function(guild=null) {
 			var [psc, client, ctx] = Holder;
-			if (guild) {
-				guild.members.fetch().then(stuff => FuckPromises(stuff, func, true));
-			} else {
-				ctx.guild.members.fetch().then(stuff => FuckPromises(stuff, func, true));
-			}
-		}
-		users(func, guild=null) { return this.memberF(func, guild); }
-
-		roles(guild=null) {
-			var [psc, client, ctx] = Holder;
-			if (guild) {
-				return Array.from(guild.roles.cache, (role) => { return role[1]; });
-			} else {
-				return Array.from(ctx.guild.roles.cache, (role) => { return role[1]; });
-			}
-		}
-
-		roleF(func, guild=null) {
-			var [psc, client, ctx] = Holder;
-			if (guild) {
-				guild.roles.fetch().then(stuff => FuckPromises(stuff, func));
-			} else {
-				ctx.guild.roles.fetch().then(stuff => FuckPromises(stuff, func));
-			}
-		}
-
-		stuff(guild=null) {
-			var [psc, client, ctx] = Holder;
-			if (guild) {
-				return Array.from(guild.channels.cache, (channel) => { return channel[1]; });
-			} else {
-				return Array.from(ctx.guild.channels.cache, (channel) => { return channel[1]; });
-			}
-		}
-
-		channels(guild=null) {
-			var [psc, client, ctx] = Holder;
-			var list;
-			if (guild) {
-				list = Array.from(guild.channels.cache, (channel) => {
-					if (channel[1].type != 4) { return channel[1]; }
-				});
-			} else {
-				list = Array.from(ctx.guild.channels.cache, (channel) => {
-					if (channel[1].type != 4) { return channel[1]; }
-				});
-			}
-
-			list = list.filter((thing) => {
-				return thing !== undefined;
-			});
 			
-			return list;
+			if (!guild) return Soup.from(await ctx.guild.members.fetch());
+			else return Soup.from(await guild.members.fetch());
 		}
 
-		channelF(func, guild=null) {
+		users = async function(guild=null) {
 			var [psc, client, ctx] = Holder;
-			if (guild) {
-				guild.channels.fetch().then(stuff => FuckPromises(stuff, func));
-			} else {
-				ctx.guild.channels.fetch().then(stuff => FuckPromises(stuff, func));
-			}
-		}
-
-		categories(guild=null) {
-			var [psc, client, ctx] = Holder;
-			var list;
-			if (guild) {
-				list = Array.from(guild.channels.cache, (channel) => {
-					if (channel[1].type == 4) { return channel[1]; }
-				});
-			} else {
-				list = Array.from(ctx.guild.channels.cache, (channel) => {
-					if (channel[1].type == 4) { return channel[1]; }
-				});
-			}
-
-			list = list.filter((thing) => {
-				return thing !== undefined;
-			});
+			var members;
 			
-			return list;
-		}
+			if (!guild) members = Soup.from(await ctx.guild.members.fetch());
+			else members = Soup.from(await guild.members.fetch());
 
-		textChannels(guild=null) {
-			var [psc, client, ctx] = Holder;
-			var list;
-			if (guild) {
-				list = Array.from(guild.channels.cache, (channel) => {
-					if (channel[1].type == 0) { return channel[1]; }
-				});
-			} else {
-				list = Array.from(ctx.guild.channels.cache, (channel) => {
-					if (channel[1].type == 0) { return channel[1]; }
-				});
-			}
-
-			list = list.filter((thing) => {
-				return thing !== undefined;
+			return members.filter( (id) => {
+				return !psc.fetchUser(id).bot;
 			});
-			
-			return list;
 		}
-		TCs(guild=null) { return this.textChannels(guild); }
 
-		voiceChannels(guild=null) {
+		bots = async function(guild=null) {
 			var [psc, client, ctx] = Holder;
-			var list;
-			if (guild) {
-				list = Array.from(guild.channels.cache, (channel) => {
-					if (channel[1].type == 2) { return channel[1]; }
-				});
-			} else {
-				list = Array.from(ctx.guild.channels.cache, (channel) => {
-					if (channel[1].type == 2) { return channel[1]; }
-				});
-			}
-
-			list = list.filter((thing) => {
-				return thing !== undefined;
-			});
+			var members;
 			
-			return list;
-		}
-		VCs(guild=null) { return this.voiceChannels(guild); }
+			if (!guild) members = Soup.from(await ctx.guild.members.fetch());
+			else members = Soup.from(await guild.members.fetch());
 
-		threadChannels(guild=null) {
+			return members.filter( (id) => {
+				return psc.fetchUser(id).bot;
+			});
+		}
+
+		roles = async function(guild=null) {
 			var [psc, client, ctx] = Holder;
-			var list;
-			if (guild) {
-				list = Array.from(guild.channels.cache, (channel) => {
-					if (channel[1].type == 11) { return channel[1]; }
-				});
-			} else {
-				list = Array.from(ctx.guild.channels.cache, (channel) => {
-					if (channel[1].type == 11) { return channel[1]; }
-				});
-			}
-
-			list = list.filter((thing) => {
-				return thing !== undefined;
-			});
 			
-			return list;
+			if (!guild) return Soup.from(await ctx.guild.roles.fetch());
+			else return Soup.from(await guild.roles.fetch());
 		}
-		threads(guild=null) { return this.threadChannels(guild); }
+
+		stuff = async function(guild=null) {
+			var [psc, client, ctx] = Holder;
+			
+			if (!guild) return Soup.from(await ctx.guild.channels.fetch());
+			else return Soup.from(await guild.channels.fetch());
+		}
+
+		channels = async function(guild=null) {
+			var [psc, client, ctx] = Holder;
+			var channels;
+			
+			if (!guild) channels = Soup.from(await ctx.guild.channels.fetch());
+			else channels = Soup.from(await guild.channels.fetch());
+
+			return channels.filter( (id, channel) => {
+				return channel.type != 4;
+			});
+		}
+
+		categories = async function(guild=null) {
+			var [psc, client, ctx] = Holder;
+			var channels;
+			
+			if (!guild) channels = Soup.from(await ctx.guild.channels.fetch());
+			else channels = Soup.from(await guild.channels.fetch());
+
+			return channels.filter( (id, channel) => {
+				return channel.type == 4;
+			});
+		}
+
+		textChannels = async function(guild=null) {
+			var [psc, client, ctx] = Holder;
+			var channels;
+			
+			if (!guild) channels = Soup.from(await ctx.guild.channels.fetch());
+			else channels = Soup.from(await guild.channels.fetch());
+
+			return channels.filter( (id, channel) => {
+				return channel.type == 0;
+			});
+		}
+		TCs = async function(guild=null) { return this.textChannels(guild); }
+
+		voiceChannels = async function(guild=null) {
+			var [psc, client, ctx] = Holder;
+			var channels;
+			
+			if (!guild) channels = Soup.from(await ctx.guild.channels.fetch());
+			else channels = Soup.from(await guild.channels.fetch());
+
+			return channels.filter( (id, channel) => {
+				return channel.type == 2;
+			});
+		}
+		VCs = async function(guild=null) { return this.voiceChannels(guild); }
+
+		threadChannels = async function(guild=null) {
+			var [psc, client, ctx] = Holder;
+			var channels;
+			
+			if (!guild) channels = Soup.from(await ctx.guild.channels.fetch());
+			else channels = Soup.from(await guild.channels.fetch());
+
+			return channels.filter( (id, channel) => {
+				return channel.type == 11;
+			});
+		}
+		threads = async function(guild=null) { return this.threadChannels(guild); }
 		
-		emojis(guild=null) {
+		emojis = async function(guild=null) {
 			var [psc, client, ctx] = Holder;
-			if (guild) {
-				return Array.from(guild.emojis.cache, (emoji) => { return emoji[1]; });
-			} else {
-				return Array.from(ctx.guild.emojis.cache, (emoji) => { return emoji[1]; });
-			}
+			
+			if (!guild) return Soup.from(await ctx.guild.emojis.fetch());
+			else return Soup.from(await guild.emojis.fetch());
 		}
 
-		emojiF(func, guild=null) {
+		stickers = async function(guild=null) {
 			var [psc, client, ctx] = Holder;
-			if (guild) {
-				guild.emojis.fetch().then(stuff => FuckPromises(stuff, func));
-			} else {
-				ctx.emojis.roles.fetch().then(stuff => FuckPromises(stuff, func));
-			}
-		}
-
-		stickers(guild=null) {
-			var [psc, client, ctx] = Holder;
-			if (guild) {
-				return Array.from(guild.stickers.cache, (sticker) => { return sticker[1]; });
-			} else {
-				return Array.from(ctx.guild.stickers.cache, (sticker) => { return sticker[1]; });
-			}
-		}
-
-		stickerF(func, guild=null) {
-			var [psc, client, ctx] = Holder;
-			if (guild) {
-				guild.stickers.fetch().then(stuff => FuckPromises(stuff, func));
-			} else {
-				ctx.guild.stickers.fetch().then(stuff => FuckPromises(stuff, func));
-			}
+			
+			if (!guild) return Soup.from(await ctx.guild.stickers.fetch());
+			else return Soup.from(await guild.stickers.fetch());
 		}
 	}
 	server = this.guild;
@@ -1042,7 +1113,7 @@ class PSClient {
 				var message = await ctx.reply(content, extras);
 			}
 			if (extras && extras.deleteAfter) {
-				setTimeout( () => { message.delete(); }, psc.time.parse(extras.deleteAfter)*1000);
+				setTimeout( () => { message.delete().catch(e=>{}); }, psc.time.parse(extras.deleteAfter)*1000);
 			}
 			return message;
 		}
@@ -1062,7 +1133,7 @@ class PSClient {
 				var message = await ctx.channel.send(content, extras);
 			}
 			if (extras && extras.deleteAfter) {
-				setTimeout( () => { message.delete(); }, psc.time.parse(extras.deleteAfter)*1000);
+				setTimeout( () => { message.delete().catch(e=>{}); }, psc.time.parse(extras.deleteAfter)*1000);
 			}
 			return message;
 		}
@@ -1173,6 +1244,13 @@ class PSClient {
 			}
 		}
 		noSlowmode(channel=null) { return this.removeSlowmode(channel); }
+
+		async messages(channel=null, limit=100) {
+			var [psc, client, ctx] = Holder;
+			
+			if (!channel) return Soup.from(await ctx.channel.messages.fetch({ limit: limit }));
+			else return Soup.from(await channel.members.fetch({ limit: limit }));
+		}
 	}
 
 	/* users and permissions */
@@ -1289,6 +1367,18 @@ class PSClient {
 		avatarUrl(user=null, dynamic=false) { return this.avatar(user, dynamic); }
 		avatarURL(user=null, dynamic=false) { return this.avatar(user, dynamic); }
 		avatar_url(user=null, dynamic=false) { return this.avatar(user, dynamic); }
+
+		ban(user, extras={reason:null, time:null, deleteTo:null}) {
+			var [psc, client, ctx] = Holder;
+
+			if (extras.time) {
+				setTimeout( () => {
+					ctx.guild.bans.remove(user.id);
+				}, psc.time.parse(extras.time)*1000);
+			}
+
+			return ctx.guild.bans.create(user.id, {reason: extras.reason, deleteMessageSeconds: psc.time.parse(extras.deleteTo)});
+		}
 		
 		roles = new class {
 			cache(user=null) {
@@ -1424,8 +1514,15 @@ class PSClient {
 		hasPermissions(permissions, user=null) {
 			return this.permissions.has(permissions, user);
 		}
+		hasPerms(permissions, user=null) { return this.hasPermissions(permissions, user); }
+		
+		hasPermission(permission, user=null) {
+			return this.permissions.has([permission], user);
+		}
+		hasPerm(permission, user=null) { return this.hasPermission(permission, user); }
 	}
 	member = this.user;
+	author = this.user;
 	
     /* running */
     run(token) {
@@ -1455,4 +1552,106 @@ function FuckPromises(stupids, func, user=false) {
 	return func(stupidList);
 }
 
-module.exports = { PSClient };
+class Embed {
+	constructor(obj) {
+		if (obj.color) { obj.color = obj.color.colorFormat(); }
+		if (obj.author) {
+			if (obj.author.icon) { obj.author.icon_url = obj.author.icon; }
+			else if (obj.author.iconURL) { obj.author.icon_url = obj.author.iconURL; }
+		}
+		if (typeof obj.thumbnail == "string") {
+			let thumbnail = obj.thumbnail;
+			obj.thumbnail = { url: thumbnail };
+		}
+		if (obj.fields) {
+			let fixFields = [];
+			
+			obj.fields.forEach( (field) => {
+				fixFields.push(field);
+				if (field.newline) { fixFields.push({ name:"** **", value: "** **", inline: false}); }
+			});
+
+			obj.fields = fixFields;
+		}
+		if (typeof obj.image == "string") {
+			let image = obj.image;
+			obj.image = { url: image };
+		}
+		if (obj.timestamp) {
+			if (obj.timestamp.toLowerCase() == "current" || obj.timestamp.toLowerCase() == "now") obj.timestamp = new Date().toISOString();
+		}
+		if (obj.footer) {
+			if (typeof obj.footer == "string") {
+				let footer = obj.footer;
+				obj.footer = { text: footer };
+			}
+			
+			if (obj.footer.name) { obj.footer.text = obj.footer.name; }
+			if (obj.footer.icon) { obj.footer.icon_url = obj.footer.icon; }
+			else if (obj.footer.iconURL) { obj.footer.icon_url = obj.footer.iconURL; }
+		}
+		
+		return obj;
+	}
+}
+
+class Selection {
+	constructor(obj) {
+		obj.type = 3;
+		if (obj.id) {
+			obj.custom_id = obj.id;
+		}
+		if (obj.label || obj.text) {
+			obj.placeholder = (obj.label) ? obj.label : obj.text;
+		}
+		if (obj.minimum || obj.min) {
+			obj.min_values = (obj.minimum) ? obj.minimum : obj.min;
+		}
+		if (obj.maximum || obj.max) {
+			obj.max_values = (obj.maximum) ? obj.maximum : obj.max;
+		}
+
+		return obj;
+	}
+}
+var SelectMenu = this.Selection;
+
+function buttonStyle(style) {
+	return (typeof style == "number")
+		? style
+	: (style.toLowerCase() == "primary")
+		? 1
+	: (style.toLowerCase() == "secondary")
+		? 2
+	: (style.toLowerCase() == "success")
+		? 3
+	: (style.toLowerCase() == "danger")
+		? 4
+	: (style.toLowerCase() == "link")
+		? 5
+	: null;
+}
+
+class ActionRow {
+	constructor(array) {
+		return { type: 1, components: array };
+	}
+}
+var Row = ActionRow;
+
+class Button {
+	constructor(obj) {
+		var [psc] = Holder;
+		obj.type = 2;
+		if (obj.id) {
+			obj.custom_id = obj.id;
+		}
+		if (obj.style) {
+			obj.style = buttonStyle(obj.style);
+		}
+		
+		return obj;
+	}
+}
+
+module.exports = { PSClient, Embed, ActionRow, Row, Button, Selection, SelectMenu, Stew, Soup };
