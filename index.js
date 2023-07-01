@@ -60,18 +60,18 @@ class PSClient {
         this.client = client;
     }
 
-	build(path, ignore=["index.js"], action=(file) => { require(`../../${path}/${file}`) }) {
+	build(path, ignore=["index.js"], action=(path, file) => { require(`../../${path}/${file}`); }) {
 		let files = fs.readdirSync(`${path}`).filter(file => (file.endsWith('.js') && !ignore.includes(file) ));
-		files.forEach(action);
+		files.forEach( (file) => { action(path, file) } );
 	}
 
-	compile(path, ignore=["index.js"], json=true) {
+	compile(path, ignore=["index.js"], action=(path, file, compiled, name) => { compiled.push(name, require(`../../${path}/${file}`)); }, json=true) {
 		let files = fs.readdirSync(`${path}`).filter(file => ((file.endsWith('.js') || (json && file.endsWith(".json"))) && !ignore.includes(file) ));
 		let stuff = new Soup(Object);
 		
 		files.forEach( (file) => {
 			let name = (file.endsWith(".js")) ? file.split(".js")[0] : (file.endsWith(".json")) ? file.split(".json")[0] : file;
-			stuff.push(name, require(`../../${path}/${file}`));
+			action(path, file, stuff, name);
 		});
 
 		return stuff;
