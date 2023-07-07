@@ -1,7 +1,7 @@
 {
     "name": "psc",
     "version": "0.6.0",
-    "author": "nutmeg",
+    "author": "paigeroid",
     "description": "A combination of Discord.JS and Discord.PY made in Node.JS",
     "dependencies": {
         "discord.js": "latest",
