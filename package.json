@@ -10,10 +10,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/nuttmegg/psc.git"
+        "url": "https://github.com/paigeroid/psc.git"
     },
     "bugs": {
-        "url": "https://github.com/nuttmegg/psc/issues"
+        "url": "https://github.com/paigeroid/psc/issues"
+    },
+    "license": {
+        "type": "MIT",
+        "url": "https://github.com/paigeroid/psc/blob/main/LICENSE"
     },
     "keywords": [
         "discord.js",
