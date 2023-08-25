@@ -1,5 +1,5 @@
 {
-    "name": "psc",
+    "name": "willclient",
     "version": "0.6.0",
     "author": "paigeroid",
     "description": "A combination of Discord.JS and Discord.PY made in Node.JS",
@@ -10,14 +10,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/paigeroid/psc.git"
+        "url": "https://github.com/paigeroid/willclient.git"
     },
     "bugs": {
-        "url": "https://github.com/paigeroid/psc/issues"
+        "url": "https://github.com/paigeroid/willclient/issues"
     },
     "license": {
         "type": "MIT",
-        "url": "https://github.com/paigeroid/psc/blob/main/LICENSE"
+        "url": "https://github.com/paigeroid/willclient/blob/main/LICENSE"
     },
     "keywords": [
         "discord.js",
@@ -25,6 +25,6 @@
         "discord",
         "psc"
     ],
-    "homepage": "https://github.com/nuttmegg/psc",
+    "homepage": "https://github.com/paigeroid/willclient",
     "main": "./index.js"
 }
