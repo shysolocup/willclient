@@ -46,6 +46,7 @@ class WillClient {
     	
     	if (this.client) {
     		ClientHandler(this, this.client);
+			this.handlerActive = true
     	}
     }
 	
@@ -2060,7 +2061,7 @@ class WillClient {
 
 
 function ClientHandler(wc, client) {
-	console.log("Will Client Started");
+	console.log("willclient started");
 	
 	client.on("messageCreate", async (ctx) => {
 		Holder = [wc, client, ctx];
