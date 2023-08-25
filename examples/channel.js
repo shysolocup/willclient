@@ -1,41 +1,41 @@
 const { Client } = require('discord.js');
 const client = new Client({ /* your stuff here */ });
-const { PSClient } = require('discordpps');
-const psc = new PSClient({ client: client, prefix: "." });
+const { WillClient } = require('willclient');
+const wc = new WillClient({ client: client, prefix: "." });
 
 const config = require('./config.json');
 
-psc.event("ready", (ctx) => {
+wc.event("ready", (ctx) => {
     console.log(`Logged in as ${ctx.user.tag}`);
 });
 
 /* commands */
 
-psc.command( {name: "purge"}, async (ctx, cmd) => {
+wc.command( {name: "purge"}, async (ctx, cmd) => {
     let amount = parseInt(cmd.args[0]);
     
-    if (psc.user.hasPermissions(["manageMessages"]) {
-        psc.channel.purge(amount, ctx.channel); // channel is optional and defautls to ctx.channel
+    if (wc.user.hasPermissions(["manageMessages"]) {
+        wc.channel.purge(amount, ctx.channel); // channel is optional and defautls to ctx.channel
     
         ctx.channel.send(`Purged ${amount} messages!`);
     }
 });
 
-psc.command( {name: "lock", aliases: ["lockdown"]}, async (ctx, cmd) => {
-    let channel = (cmd.args.length > 0) ? psc.fetchChannel(cmd.args[0]) : ctx.channel;
+wc.command( {name: "lock", aliases: ["lockdown"]}, async (ctx, cmd) => {
+    let channel = (cmd.args.length > 0) ? wc.fetchChannel(cmd.args[0]) : ctx.channel;
     
-    if (psc.user.hasPermissions(["manageChannels"]) {
-        psc.channel.lock(channel);
+    if (wc.user.hasPermissions(["manageChannels"]) {
+        wc.channel.lock(channel);
     
         ctx.channel.send(`Locked ${channel.name}!`);
     }
 });
 
-psc.command( {name: "unlock", aliases: ["unlockdown"]}, async (ctx, cmd) => {
-    let channel = (cmd.args.length > 0) ? psc.fetchChannel(cmd.args[0]) : ctx.channel;
+wc.command( {name: "unlock", aliases: ["unlockdown"]}, async (ctx, cmd) => {
+    let channel = (cmd.args.length > 0) ? wc.fetchChannel(cmd.args[0]) : ctx.channel;
     
-    if (psc.user.hasPermissions(["manageChannels"]) {
-        psc.channel.unlock(channel);
+    if (wc.user.hasPermissions(["manageChannels"]) {
+        wc.channel.unlock(channel);
     
         ctx.channel.send(`Unlocked ${channel.name}!`);
 });
