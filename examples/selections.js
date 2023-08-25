@@ -1,20 +1,18 @@
 const { Client } = require('discord.js');
-const discordClient = new Client({ /* your stuff here */ });
-
-const { PSClient } = require('discordpps');
-const client = new PSClient({ client: discordClient, prefix: "." });
+const client = new Client({ /* your stuff here */ });
+const { WillClient } = require('willclient');
+const wc = new WillClient({ client: client, prefix: "!" });
 
 const config = require('./config.json');
 
-
-client.event("ready", (ctx) => {
+wc.event("ready", (ctx) => {
     console.log(`Logged in as ${ctx.user.tag}`);
 });
 
 /* commands */
 
-client.command( {name: "selections"}, async (ctx, cmd) => {
-    let select = client.Selection({
+wc.command( {name: "selections"}, async (ctx, cmd) => {
+    let select = wc.Selection({
         id: "question",
         placeholder: "Choose wisely..",
         min: 1,
@@ -27,14 +25,14 @@ client.command( {name: "selections"}, async (ctx, cmd) => {
         ]
     });
     
-    let row = client.ActionRow([select]);
+    let row = wc.ActionRow([select]);
     
-    client.reply({components: [row]});
+    ctx.reply({components: [row]});
 });
 
 /* selection event */
 
-client.selectionAction(async (ctx) => {
+wc.selectionAction(async (ctx) => {
     if (ctx.customId == "question") {
         if (ctx.values[0] == "a") {
             ctx.reply("You picked Option A!");
