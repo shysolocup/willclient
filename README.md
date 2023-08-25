@@ -2,7 +2,7 @@
 
 <div align="center" text-align="center">
 	<br />
-	<img src="https://github.com/paigeroid/willclient/blob/main/assets/willclient.png">
+	<img src="https://github.com/paigeroid/willclient/blob/main/assets/willclient-logo.png">
 	<br />
 	<a href="https://www.npmjs.com/package/willclient"><img src="https://img.shields.io/npm/v/willclient?style=flat&color=red&logo=npm&logoColor=white" alt="version" />
 	<a href="https://www.npmjs.com/package/willclient"><img src="https://img.shields.io/npm/dt/willclient?style=flat&color=green&logo=docusign&logoColor=white" alt="downloads" />
