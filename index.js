@@ -1,44 +1,31 @@
-/* :: Discord+PS :: Version 0.6.0 | 07/01/23 :: */
+/*
+	:: Will Client :: Version 0.6.0 | 08/25/23 ::
+	https://github.com/paigeroid/will-client
 
-/* :: Created by nutmeg using :: *//*
-	- Stews: https://github.com/nuttmegg/stews
-	- NutFL: https://github.com/nuttmegg/nutfl
 */
+
+/* :: Created by @paigeroid using :: *//*
+	- Stews: https://github.com/paigeroid/stews
+	- NutFL: https://github.com/paigeroid/nutfl
+*/
+
 
 const { ActivityType } = require('discord.js');
 const voice = require('@discordjs/voice');
-const { Stew, Soup, random } = require('stews');
+const { Stew, Soup, Noodle, random } = require('stews');
 var fs = require('fs');
 
 
+// String Functions
 String.prototype.colorFormat = function() {
 	if (this.startsWith("#")) { var a = this.replace("#", "0x"); return parseInt(a); } else { return 0x5865F2; }
 };
-
-Object.defineProperty(String.prototype, "block", {
-	get() { return "`"+this+"`" }, set(){}
-});
-
-Object.defineProperty(String.prototype, "bold", {
-	get() { return `**${this}**`; }, set(){}
-});
-
-Object.defineProperty(String.prototype, "linethrough", {
-	get() { return `~~${this}~~`; }, set(){}
-});
-
-Object.defineProperty(String.prototype, "bold", {
-	get() { return `**${this}**`; }, set(){}
-});
-
-Object.defineProperty(String.prototype, "spoiler", {
-	get() { return `||${this}||`; }, set(){}
-});
-
 String.prototype.codeBlock = function(language=null) {
-	return (language) ? "```"+language+"\n"+this+"```" : "```"+this+"```";
+	return (language) ? `\`\`\`${language}\n${this}\`\`\`` : `\`\`\`${this}\`\`\``;
 };
 
+
+// Error Handling
 class CoolError extends Error {
     constructor(name, message) {
         super(message);
@@ -46,24 +33,33 @@ class CoolError extends Error {
     }
 }
 
+
+// Holder
 var Holder;
 
-class PSClient {
-    constructor(settings) {this.client=settings.client; this.prefix=settings.prefix}
+
+// Main
+class WillClient {
+    constructor(settings) {
+    	this.client = settings.client;
+    	this.prefix = settings.prefix
+    	
+    	if (this.client) {
+    		ClientHandler(this, this.client);
+    	}
+    }
 	
     /* configurations */
     setPrefix(prefix) {
         this.prefix = prefix;
     }
-    
-    setClient(client) {
-        this.client = client;
-    }
+
 
 	build(path, ignore=["index.js"], action=(path, file) => { require(`../../${path}/${file}`); }) {
 		let files = fs.readdirSync(`${path}`).filter(file => (file.endsWith('.js') && !ignore.includes(file) ));
 		files.forEach( (file) => { action(path, file) } );
 	}
+
 
 	compile(path, ignore=["index.js"], action=(path, file, compiled, name) => { compiled.push(name, require(`../../${path}/${file}`)); }, json=true) {
 		let files = fs.readdirSync(`${path}`).filter(file => ((file.endsWith('.js') || (json && file.endsWith(".json"))) && !ignore.includes(file) ));
@@ -78,9 +74,11 @@ class PSClient {
 	}
     
     
+    
     /* variables */
     commandList = new Stew(Object);
 	handlerActive = false;
+	
 	
 	globalCooldown = {
 		data: new Set(),
@@ -88,7 +86,7 @@ class PSClient {
     	time: 0,
     	
     	handle: function(user=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 
 			user = (user) ? user : ctx.author;
 					
@@ -99,11 +97,13 @@ class PSClient {
         	}
     	},
     	
+    	
     	fetch: function(user=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			return (this.data.has( (user) ? user.id : ctx.author.id )) ? true : false;
     	}
 	};
+	
 	
 	setCooldown(time) {
 		time = this.time.parse(time);
@@ -116,72 +116,90 @@ class PSClient {
 		this.globalCooldown.timestamp = this.time.set.relative( Math.abs(this.time.parse(time)*1000 + (Date.now())) );
 		this.globalCooldown.active = true;
 
+
 		Object.defineProperties(this.globalCooldown, {
+			
 			relative: { get() {
-				var [psc, client, ctx] = Holder;
-				let now = parseInt(psc.time.now.relative.split(":")[1]);
+				var [wc, client, ctx] = Holder;
+				let now = parseInt(wc.time.now.relative.split(":")[1]);
 				let raw = Math.abs( time + parseInt(now) );
 				return `<t:${raw}:R>`;
 			}},
 			
+			
 			raw: { get() {
-				var [psc, client, ctx] = Holder;
-				let now = parseInt(psc.time.now.relative.split(":")[1]);
+				var [wc, client, ctx] = Holder;
+				let now = parseInt(wc.time.now.relative.split(":")[1]);
 				return Math.abs( time + parseInt(now) );
 			}}
+			
 		});
 	}
+	
 	
 	deleteCooldown() {
 		this.globalCooldown.active = false;
 	}
     
     
+    
     /* commands */
     command(info={name:null, aliases:null, cooldown:null}, data) {
 		if (!this.handlerActive) { this.handlerActive = true; ClientHandler(this, this.client); }
+
 
 		if (typeof info == "string") {
 			let thing = info;
 			info = { name: thing, aliases: null, cooldown: null};
 		}
 		
+		
 		var [name, aliases] = [info.name, info.aliases];
+		
 		
 		if (info.cooldown && typeof info.cooldown == "number") { var time = info.cooldown; }
 		else if (info.cooldown && typeof info.cooldown == "string") { var time = this.time.parse(info.cooldown); }
 		else if (info.cooldown) { throw new CoolError("Command Creation", 'Invalid cooldown. ( cooldown: 3 | cooldown: "3s" )'); }
 		
+		
 		if (!name || typeof name != "string" || name.length <= 0) {
 			throw new CoolError("Command Creation", "Invalid command name.\n\nPossible reasons:\n    • doesn't exist\n    • not a string\n    • blank string\n\nActual error stuff:");
 		}
+		
+		
 		if (this.commandExists(name)) {
 			throw new CoolError("Command Creation", "Command with that name already exists.");
 		}
+		
+		
 		if (info.cooldown) {
 			if (typeof time != "number") {
 				throw new CoolError("Command Creation", "Cooldown has to be an integer (seconds)");
 			}
+			
+			
 			info.cooldown = {
     			data: new Set(),
     			active: true,
     			time: time,
 				
 				get relative() {
-					var [psc, client, ctx] = Holder;
-					let now = parseInt(psc.time.now.relative.split(":")[1]);
+					var [wc, client, ctx] = Holder;
+					let now = parseInt(wc.time.now.relative.split(":")[1]);
 					let raw = Math.abs( info.cooldown.time + parseInt(now) );
 					return `<t:${raw}:R>`;
 				},
 				
+				
 				get raw() {
-					var [psc, client, ctx] = Holder;
-					let now = parseInt(psc.time.now.relative.split(":")[1]);
+					var [wc, client, ctx] = Holder;
+					let now = parseInt(wc.time.now.relative.split(":")[1]);
 					return Math.abs( info.cooldown.time + parseInt(now) );
 				},
+				
     			
     			handle(user=null) {
-					var [psc, client, ctx] = Holder;
+					var [wc, client, ctx] = Holder;
 
 					user = (user) ? user : ctx.author;
 					
@@ -192,24 +210,31 @@ class PSClient {
         			}
     			},
     			
+    			
     			fetch(user=null) {
-					var [psc, client, ctx] = Holder;
+					var [wc, client, ctx] = Holder;
 					return (this.data.has( (user) ? user.id : ctx.author.id )) ? true : false;
     			}
 			};
 		}
+		
         let newCMD = {"info": Soup.from(info), "data": data};
         this.commandList.push(info.name, newCMD);
+        
 		return newCMD;
     }
 
+
 	commandExists(name) {
 		var exists;
+		
 		try {
+			
         	for (let i = 0; i < this.commandList.length; i++) {
         	    let info = this.commandList.get(i).info;
         		if (info.get("name") == name || (info.get("aliases") && info.get("aliases").includes(name)) ) { throw true; }
         	}
+        	
         	throw false;
         	
         } catch(has) {
@@ -219,8 +244,10 @@ class PSClient {
 		return exists;
 	}
     
+    
     fetchCommand(name, func=null) {
         var index;
+        
         try {
         	for (let i = 0; i < this.commandList.length+1; i++) {
         	    var info = this.commandList.get(i).info;
@@ -233,23 +260,29 @@ class PSClient {
             else index = has;
         }
         
+        
         let command = this.commandList.get(index);
 		
 		let returns = {
+			
 			name: command.info.get("name"),
 			aliases: command.info.get("aliases"),
 			cooldown: command.info.get("cooldown"),
 			data: command.data
+		
 		};
         
         return (!func) ? returns : func(returns);
     }
     
+    
     fetchCMD(name, func=null) { return this.fetchCommand(name,func); }
+    
     
     executeCommand(name, ctx, cmd) {
 		var onCooldown; var cooldown; var cooldownType
     	var command = this.fetchCommand(name);
+    	
     	
     	if (command.cooldown && command.cooldown.active) {
 			if (command.cooldown.fetch()) {
@@ -257,49 +290,62 @@ class PSClient {
 				cooldownType = "commandCooldown";
 				onCooldown = true;
 			}
+			
 			command.cooldown.handle();
     	}
+    	
     	else if (this.globalCooldown && this.globalCooldown.active) {
 			if (this.globalCooldown.fetch()) {
 				cooldown = this.globalCooldown;
 				cooldownType = "globalCooldown";
 				onCooldown = true;
 			}
+			
 			this.globalCooldown.handle();
     	}
+    	
 		else {
+			
 			cooldown = {};
 			onCooldown = false;
 			cooldownType = null;
+			
 		}
     	
     	cmd.onCooldown = (onCooldown) ? onCooldown : false;
 		cmd.cooldownType = (cooldownType) ? cooldownType : null;
 		cmd.cooldown = (cooldown) ? cooldown : {};
     	
+    	
     	return command.data(ctx, cmd);
     }
     
     executeCMD(name, ctx, cmd=null) { return this.executeCommand(name, ctx, cmd); }
 
+
 	commandFormat(string, prefix) {
 		let res = {};
-		let pos = (prefix)
-			? string.toLowerCase().indexOf(prefix.toLowerCase())
-		: 0;
+		let pos = (prefix) ?
+			
+			string.toLowerCase().indexOf(prefix.toLowerCase())
+			: 0;
 		
-		res["name"] = (prefix)
-			? string.toLowerCase().replace(prefix.toLowerCase(), "").split(" ")[pos]
-		: string.toLowerCase().split(" ")[pos];
+		
+		res["name"] = (prefix) ?
+		
+			string.toLowerCase().replace(prefix.toLowerCase(), "").split(" ")[pos]
+			: string.toLowerCase().split(" ")[pos];
+			
 
 		let soup = new Soup(string.split(" "));
-
 		delete soup[pos];
 		
 		res["args"] = soup.pour();
 		
+		
 		return res;
 	}
+
 
 	commandHandler(ctx) {
 		if (ctx.author.bot || ctx.author.id == this.client.user.id) return;
@@ -315,175 +361,425 @@ class PSClient {
 		}
 	}
     
+    
+    
     /* events */
     eventList = {
+    	
+    	// run bot
     	"start": "ready",
     	"run": "ready",
     	"login": "ready",
 		"ready": "ready",
-		"message": "message",
-		"newMessage": "messageCreate",
-		"send": "messageCreate",
-		"join": "guildMemberAdd",
-		"joinGuild": "guildMemberAdd",
-		"newMember": "guildMemberAdd",
-		"memberAdd": "guildMemberAdd",
-		"memberJoin": "guildMemberAdd",
-		"newCommand": "applicationCommandCreate",
-		"commandCreate": "applicationCommandCreate",
-		"createCommand": "applicationCommandCreate",
-		"commandDelete": "applicationCommandDelete",
-		"deleteCommand": "applicationCommandDelete",
-		"commandUpdate": "applicationCommandUpdate",
-		"updateCommand": "applicationCommandUpdate",
-		"commandEdit": "applicationCommandUpdate",
-		"editCommand": "applicationCommandUpdate",
-		"newChannel": "channelCreate",
-		"createChannel": "channelCreate",
-		"deleteChannel": "channelDelete",
-		"pin": "channelPinsUpdate",
-		"newPin": "channelPinsUpdate",
-		"pinsUpdate": "channelPinsUpdate",
-		"updatePins": "channelPinsUpdate",
-		"updateChannel": "channelUpdate",
-		"editChannel": "channelUpdate",
-		"channelEdit": "channelUpdate",
-		"chanelUpdate": "channelUpdate",
-		"debug": "debug",
-		"warn": "warn",
-		"newEmoji": "emojiCreate",
-		"deleteEmoji": "emojiDelete",
-		"updateEmoji": "emojiUpdate",
-		"editEmoji": "emojiUpdate",
-		"emojiEdit": "emojiUpdate",
-		"error": "error",
-		"ban": "guildBanAdd",
-		"unban": "guildBanRemove",
-		"newGuild": "guildCreate",
-		"deleteGuild": "guildDelete",
-		"guildUnavailable": "guildUnavailable",
-		"updateIntegrations": "guildIntegrationsUpdate",
-		"memberAvailable": "guildMemberAvailable",
-		"leave": "guildMemberRemove",
-		"leaveGuild": "guildMemberRemove",
-		"memberRemove": "guildMemberRemove",
-		"removeMember": "guildMemberRemove",
-		"memberChunk": "guildMemberChunk",
-		"updateMember": "guildMemberUpdate",
-		"editMember": "guildMemberUpdate",
-		"memberEdit": "guildMemberUpdate",
-		"memberUpdate": "guildMemberUpdate",
-		"updateGuild": "guildUpdate",
-		"editGuild": "guildUpdate",
-		"guildEdit": "guildUpdate",
-		"invite": "inviteCreate",
-		"newInvite": "inviteCreate",
-		"createInvite": "inviteCreate",
-		"deleteInvite": "inviteDelete",
-		"deleteMessage": "messageDelete",
-		"removeAllReactions": "messageReactionRemoveAll",
-		"removeReactionEmoji": "messageReactioRemoveEmoji",
-		"bulkDelete": "messageDeleteBulk",
-		"deleteBulk": "messageDeleteBulk",
-		"purge": "messageDeleteBulk",
-		"reaction": "messageReactionAdd",
-		"newReaction": "messageReactionAdd",
-		"reactionAdd": "messageReactionAdd",
-		"createReaction": "messageReactionAdd",
-		"reactionCreate": "messageReactionAdd",
-		"Addreaction": "messageReactionAdd",
-		"removeReaction": "messageReactionRemove",
-		"reactionRemove": "messageReactionRemove",
-		"updateMessage": "messageUpdate",
-		"edit": "messageUpdate",
-		"editMessage": "messageUpdate",
-		"messageEdit": "messageUpdate",
-		"updatePresence": "presenceUpdate",
-		"editPresence": "presenceUpdate",
-		"presenceEdit": "presenceUpdate",
-		"rateLimit": "rateLimit",
-		"slowmode": "rateLimit",
-		"invalidRequestWarning": "invalidRequestWarning",
-		"invalidated": "invalidated",
-		"createRole": "roleCreate",
-		"newRole": "roleCreate",
-		"deleteRole": "roleDelete",
-		"updateRole": "roleUpdate",
-		"editRole": "roleUpdate",
-		"roleEdit": "roleUpdate",
-		"newThread": "threadCreate",
-		"createThread": "threadCreate",
-		"deleteThread": "threadDelete",
-		"threadListSync": "threadListSync",
-		"threadMemberUpdate": "threadMemberUpdate",
-		"threadMembersUpdate": "threadMembersUpdate",
-		"updateThread": "threadUpdate",
-		"editThread": "threadUpdate",
-		"threadEdit": "threadUpdate",
-		"typing": "typingStart",
-		"updateUser": "userUpdate",
-		"editUser": "userUpdate",
-		"userEdit": "userUpdate",
-		"voiceUpdate": "voiceStateUpdate",
-		"updateVoice": "voiceStateUpdate",
-		"updateVoiceState": "voiceStateUpdate",
-		"updateWebhook": "webhookUpdate",
-		"editWebhook": "webhookUpdate",
-		"webhookEdit": "webhookUpdate",
-		"interaction": "interactionCreate",
-		"createInteraction": "interactionCreate",
-		"newInteraction": "interactionCreate",
-		"shardDisconnect": "shardDisconnect",
-		"shardError": "shardError",
-		"shardReady": "shardReady",
-		"shardReconnecting": "shardReconnecting",
-		"shardResume": "shardResume",
-		"newStage": "stageInstanceCreate",
-		"createStage": "stageInstanceCreate",
-		"stageCreate": "stageInstanceCreate",
-		"newStageInstance": "stageInstanceCreate",
-		"createStageInstance": "stageInstanceCreate",
-		"updateStage": "stageInstanceUpdate",
-		"stageUpdate": "stageInstanceUpdate",
-		"updateStageInstance": "stageInstanceUpdate",
-		"editStage": "stageInstanceUpdate",
-		"stageEdit": "stageInstanceUpdate",
-		"editStageInstance": "stageInstanceUpdate",
-		"deleteStage": "stageInstanceDelete",
-		"stageDelete": "stageInstanceDelete",
-		"deleteStageInstance": "stageInstanceDelete",
-		"newSticker": "stickerCreate",
-		"createSticker": "stickerCreate",
-		"deleteSticker": "stickerDelete",
-		"updateSticker": "stickerUpdate",
-		"editSticker": "stickerUpdate",
-		"stickerEdit": "stickerUpdate",
-		"button": "interactionCreate",
-		"buttonPress": "interactionCreate",
-		"buttonPressed": "interactionCreate",
-		"selection": "interactionCreate",
-		"select": "interactionCreate",
-		"selectMenu": "interactionCreate",
-		"submitSelection": "interactionCreate",
-		"submitSelectMenu": "interactionCreate",
-		"selectSubmit": "interactionCreate",
-		"selectMenuSubmit": "interactionCreate",
-		"selectionSubmit": "interactionCreate"
+		
+		
+		
+		/* :: MESSAGES :: */
+		
+			// message
+			"message": "message",
+			
+			// message sent
+			"createMessage": "messageCreate",
+			"newMessage": "messageCreate",
+			"messageSent": "messageCreate",
+			"send": "messageCreate",
+			
+			// edit message
+			"updateMessage": "messageUpdate",
+			"edit": "messageUpdate",
+			"editMessage": "messageUpdate",
+			"messageEdit": "messageUpdate",
+			
+			// delete message
+			"deleteMessage": "messageDelete",
+			
+			// bulk delete
+			"bulkDelete": "messageDeleteBulk",
+			"deleteBulk": "messageDeleteBulk",
+			"purge": "messageDeleteBulk",
+			
+			// pin message
+			"pin": "channelPinsUpdate",
+			"newPin": "channelPinsUpdate",
+			"pinsUpdate": "channelPinsUpdate",
+			"updatePins": "channelPinsUpdate",
+		
+		
+		
+		/* :: MEMBERS ** */
+		
+			// member join
+			"join": "guildMemberAdd",
+			"joinGuild": "guildMemberAdd",
+			"joinServer": "guildMemberAdd",
+			"newMember": "guildMemberAdd",
+			"memberAdd": "guildMemberAdd",
+			"memberJoin": "guildMemberAdd",
+			"newUser": "guildMemberAdd",
+			"userAdd": "guildMemberAdd",
+			"userJoin": "guildMemberAdd",
+			
+			// member update
+			"updateUser": "userUpdate",
+			"editUser": "userUpdate",
+			"userEdit": "userUpdate",
+			"updateMember": "userUpdate",
+			"editMember": "userUpdate",
+			"memberEdit": "userUpdate",
+		
+			// guild member update
+			"updateGuildMember": "guildMemberUpdate",
+			"editGuildMember": "guildMemberUpdate",
+			"guildMemberEdit": "guildMemberUpdate",
+			"updateGuildUser": "guildMemberUpdate",
+			"editGuildUser": "guildMemberUpdate",
+			"guildUserEdit": "guildMemberUpdate",
+			"guildUserUpdate": "guildMemberUpdate",
+			
+			// member leave
+			"leave": "guildMemberRemove",
+			"leaveGuild": "guildMemberRemove",
+			"userLeave": "guildMemberRemove",
+			"memberLeave": "guildMemberRemove",
+			"memberRemove": "guildMemberRemove",
+			"userRemove": "guildMemberRemove",
+			"removeMember": "guildMemberRemove",
+			"removeUser": "guildMemberRemove",
+			
+			// member ban
+			"ban": "guildBanAdd",
+			"banUser": "guildBanAdd",
+			"banMember": "guildBanAdd",
+			"banAdd": "guildBanAdd",
+			"addBan": "guildBanAdd",
+			
+			// member unban
+			"unban": "guildBanRemove",
+			"unbanUser": "guildBanRemove",
+			"unbanMember": "guildBanRemove",
+			"removeBan": "guildBanRemove",
+			"banRemove": "guildBanRemove",
+			
+			// member typing
+			"typing": "typingStart",
+			"userTyping": "typingStart",
+			"memberTyping": "typingStart",
+			
+			// member available
+			"memberAvailable": "guildMemberAvailable",
+			"userAvailable": "guildMemberAvailable",
+			
+			// member chunk
+			"memberChunk": "guildMemberChunk",
+			"userChunk": "guildMemberChunk",
+		
+		
+		
+		/* :: SLASH COMMAND :: */
+			
+			// create slash command
+			"newCommand": "applicationCommandCreate",
+			"commandCreate": "applicationCommandCreate",
+			"createCommand": "applicationCommandCreate",
+			
+			// delete slash command
+			"commandDelete": "applicationCommandDelete",
+			"deleteCommand": "applicationCommandDelete",
+			
+			// update slash command
+			"commandUpdate": "applicationCommandUpdate",
+			"updateCommand": "applicationCommandUpdate",
+			"commandEdit": "applicationCommandUpdate",
+			"editCommand": "applicationCommandUpdate",
+		
+		
+		
+		/* :: CHANNELS :: */
+			
+			// create channel
+			"newChannel": "channelCreate",
+			"createChannel": "channelCreate",
+			
+			// delete channel
+			"deleteChannel": "channelDelete",
+			
+			// update channel
+			"updateChannel": "channelUpdate",
+			"editChannel": "channelUpdate",
+			"channelEdit": "channelUpdate",
+			"chanelUpdate": "channelUpdate",
+			
+			
+		
+		/* :: GUILDS :: */
+		
+			// create guild
+			"newGuild": "guildCreate",
+			"createGuild": "guildCreate",
+			
+			// update guild
+			"updateGuild": "guildUpdate",
+			"editGuild": "guildUpdate",
+			"guildEdit": "guildUpdate",
+			
+			// delete guild
+			"deleteGuild": "guildDelete",
+			
+			// guild unavailable
+			"guildUnavailable": "guildUnavailable",
+			
+			
+			
+		/* :: ROLES :: */
+			// create role
+			"createRole": "roleCreate",
+			"newRole": "roleCreate",
+			
+			// update role
+			"updateRole": "roleUpdate",
+			"editRole": "roleUpdate",
+			"roleEdit": "roleUpdate",
+			
+			// delete role
+			"deleteRole": "roleDelete",
+			
+			
+			
+		/* :: EMOJIS :: */
+		
+			// create emoji
+			"newEmoji": "emojiCreate",
+			"createEmoji": "emojiCreate",
+			
+			// update emoji
+			"updateEmoji": "emojiUpdate",
+			"editEmoji": "emojiUpdate",
+			"emojiEdit": "emojiUpdate",
+			
+			// delete emoji
+			"deleteEmoji": "emojiDelete",
+			"removeEmoji": "emojiDelete",
+			
+			
+			
+		/* :: STICKERS :: */
+			// create sticker
+			"newSticker": "stickerCreate",
+			"createSticker": "stickerCreate",
+			
+			// update sticker
+			"updateSticker": "stickerUpdate",
+			"editSticker": "stickerUpdate",
+			"stickerEdit": "stickerUpdate",
+			
+			// delete sticker
+			"deleteSticker": "stickerDelete",
+			"removeSticker": "stickerDelete",
+			
+			
+			
+		/* :: REACTIONS :: */
+			
+			// add reaction
+			"reaction": "messageReactionAdd",
+			"newReaction": "messageReactionAdd",
+			"reactionAdd": "messageReactionAdd",
+			"createReaction": "messageReactionAdd",
+			"reactionCreate": "messageReactionAdd",
+			"Addreaction": "messageReactionAdd",
+			
+			// remove reaction
+			"removeReaction": "messageReactionRemove",
+			"reactionRemove": "messageReactionRemove",
+			
+			// remove all reactions
+			"removeAllReactions": "messageReactionRemoveAll",
+		
+			// remove reaction emoji
+			"removeReactionEmoji": "messageReactioRemoveEmoji",
+			
+			
+			
+		/* :: BUTTONS :: */
+		
+			"button": "interactionCreate",
+			"buttonPress": "interactionCreate",
+			"buttonPressed": "interactionCreate",
+		
+		
+		
+		/* :: SELECT MENUS :: */
+		
+			"selection": "interactionCreate",
+			"select": "interactionCreate",
+			"selectMenu": "interactionCreate",
+			"submitSelection": "interactionCreate",
+			"submitSelectMenu": "interactionCreate",
+			"selectSubmit": "interactionCreate",
+			"selectMenuSubmit": "interactionCreate",
+			"selectionSubmit": "interactionCreate"
+			
+			
+			
+		/* :: INTERACTIONS :: */
+		
+			// create interaction
+			"interaction": "interactionCreate",
+			"createInteraction": "interactionCreate",
+			"newInteraction": "interactionCreate",
+			
+			
+			
+		/* :: VOICE :: */
+		
+			// voice state update
+			"voiceUpdate": "voiceStateUpdate",
+			"updateVoice": "voiceStateUpdate",
+			"updateVoiceState": "voiceStateUpdate",
+			"theVoices": "voiceStateUpdate",
+			
+			
+		
+		/* :: THREADS :: */
+		
+			// create thread
+			"newThread": "threadCreate",
+			"createThread": "threadCreate",
+			
+			// update thread
+			"updateThread": "threadUpdate",
+			"editThread": "threadUpdate",
+			"threadEdit": "threadUpdate",
+			
+			// delete thread
+			"deleteThread": "threadDelete",
+			
+			// thread list sync
+			"threadListSync": "threadListSync",
+			
+			// thread member update
+			"threadMemberUpdate": "threadMemberUpdate",
+			
+			// thread members update
+			"threadMembersUpdate": "threadMembersUpdate",
+			
+			
+			
+		/* :: STAGES :: */
+		
+			// create stage
+			"newStage": "stageInstanceCreate",
+			"createStage": "stageInstanceCreate",
+			"stageCreate": "stageInstanceCreate",
+			"newStageInstance": "stageInstanceCreate",
+			"createStageInstance": "stageInstanceCreate",
+			
+			
+			// update stage
+			"updateStage": "stageInstanceUpdate",
+			"stageUpdate": "stageInstanceUpdate",
+			"updateStageInstance": "stageInstanceUpdate",
+			"editStage": "stageInstanceUpdate",
+			"stageEdit": "stageInstanceUpdate",
+			"editStageInstance": "stageInstanceUpdate",
+			
+			
+			// delete stage
+			"deleteStage": "stageInstanceDelete",
+			"stageDelete": "stageInstanceDelete",
+			"deleteStageInstance": "stageInstanceDelete",
+		
+		
+		
+		/* :: INVITES :: */
+			
+			// create invite
+			"invite": "inviteCreate",
+			"newInvite": "inviteCreate",
+			"createInvite": "inviteCreate",
+			
+			// delete invite
+			"deleteInvite": "inviteDelete",
+			
+			
+			
+		/* :: WEBHOOKS :: */
+		
+			// webhook update
+			"updateWebhook": "webhookUpdate",
+			"editWebhook": "webhookUpdate",
+			"webhookEdit": "webhookUpdate",
+		
+		
+		
+		/* :: PRESENCE :: */
+		
+			// update presence
+			"updatePresence": "presenceUpdate",
+			"editPresence": "presenceUpdate",
+			"presenceEdit": "presenceUpdate",
+		
+		
+		
+		/* :: INTEGRATIONS :: */
+		
+			// update integration
+			"updateIntegrations": "guildIntegrationsUpdate",
+			"integrationsUpdate": "guildIntegrationsUpdate",
+			
+			
+		/* :: RATE LIMIT/SLOWMODE :: */
+		
+			"rateLimit": "rateLimit",
+			"slowmode": "rateLimit",
+			
+			
+		
+		/* :: SHARD :: */
+		
+			"shardDisconnect": "shardDisconnect",
+			"shardError": "shardError",
+			"shardReady": "shardReady",
+			"shardReconnecting": "shardReconnecting",
+			"shardResume": "shardResume",
+		
+		
+		
+		/* :: DEBUG :: */
+		
+			"debug": "debug",
+			
+			// warn
+			"warn": "warn",
+			
+			// error
+			"error": "error",
+			
+			// invalid request warning
+			"invalidRequestWarning": "invalidRequestWarning",
+			
+			// invalidated
+			"invalidated": "invalidated",
+			
 	};
+    
     
     event(name, func) {
 		let eventName = (Object.keys(this.eventList).includes(name))
 			? this.eventList[name]
 		: (Object.values(this.eventList).includes(name))
 			? name
-		: function() { throw new CoolError("psc Event", "Invalid event name.") }();
+		: function() { throw new CoolError("Event Error", "Invalid event name.") }();
+		
+		let noodName = Noodle.new(name);
 		
 		this.client.on(eventName, (ctx) => {
 			if (eventName == "interactionCreate") {
-				if (ctx.isButton() && (name == "button" || name == "buttonPress" || name == "buttonPressed")) {
+				if (ctx.isButton() && noodName.equalTo("button", "buttonPress", "buttonPressed") ) {
 					return func(ctx);
 				}
-				if (ctx.isSelectMenu() && (name == "selection" || name == "select" || name == "selectMenu" || name == "submitSelection" || name == "submitSelectMenu" || name == "selectSubmit" || name == "selectMenuSubmit" || name == "selectionSubmit")) {
+				if (ctx.isSelectMenu() && noodName.equalTo("selection", "select", "selectMenu", "submitSelection", "submitSelectMenu", "selectSubmit", "selectMenuSubmit", "selectionSubmit") ) {
 					return func(ctx);
 				}
 			}
@@ -493,6 +789,7 @@ class PSClient {
 	on(name, func) { return this.event(name, func); }
 	action(name, func) { return this.event(name, func); }
 	
+	
 	buttonAction(func) {
 		this.client.on("interactionCreate", (ctx) => {
 			if (ctx.isButton()) {
@@ -500,6 +797,7 @@ class PSClient {
 			}
 		});
 	}
+	
 	
 	selectionAction(func) {
 		this.client.on("interactionCreate", (ctx) => {
@@ -509,6 +807,7 @@ class PSClient {
 		});
 	}
 
+
 	selectMenuAction(func) {
 		this.client.on("interactionCreate", (ctx) => {
 			if (ctx.isStringSelectMenu()) {
@@ -517,6 +816,7 @@ class PSClient {
 		});
 	}
 	
+	
 	rowAction(func) {
 		this.client.on("interactionCreate", (ctx) => {
 			if (ctx.isButton() || ctx.isStringSelectMenu()) {
@@ -524,6 +824,7 @@ class PSClient {
 			}
 		});
 	}
+
 
 	/* embeds */
 	colors = {
@@ -559,9 +860,11 @@ class PSClient {
 		nut:"#FFEC67"
 	};
 	
+	
 	colorFormat(hexColor) {
 		if (hexColor.startsWith("#")) { var a = hexColor.replace("#", "0x"); return parseInt(a); } else { return 0x5865F2; }
 	}
+	
 	
 	Embed = class {
 		constructor(obj) {
@@ -606,6 +909,7 @@ class PSClient {
 		}
 	}
 
+
 	buttonStyle(style) {
 		return (typeof style == "number")
 			? style
@@ -622,6 +926,7 @@ class PSClient {
 		: null;
 	}
 
+
 	ActionRow = class {
 		constructor(array) {
 			return { type: 1, components: array };
@@ -629,20 +934,22 @@ class PSClient {
 	}
 	Row = this.ActionRow;
 
+
 	Button = class {
 		constructor(obj) {
-			var [psc] = Holder;
+			var [wc] = Holder;
 			obj.type = 2;
 			if (obj.id) {
 				obj.custom_id = obj.id;
 			}
 			if (obj.style) {
-				obj.style = psc.buttonStyle(obj.style);
+				obj.style = wc.buttonStyle(obj.style);
 			}
 			
 			return obj;
 		}
 	}
+
 
 	Selection = class {
 		constructor(obj) {
@@ -666,28 +973,46 @@ class PSClient {
 
 	SelectMenu = this.Selection;
 	
+	
 
 	/* fetches */
 	fetchUser(id) { if (!id) return null; let mention = id; if (mention.startsWith('<@') && mention.endsWith('>')) {mention = mention.slice(2, -1); if (mention.startsWith('!')) {mention = mention.slice(1); }} mention = mention.split("").join(""); let user = this.client.users.fetch(mention).catch(e=>{}); return (!user) ? null : user; }
+	
 	fetchMember(id) { return this.fetchUser(id); }
 	
-	fetchGuildUser(id, guild=null) { if (!id) return null; var [psc, client, ctx] = Holder; let mention = id; if (mention.startsWith('<@') && mention.endsWith('>')) {mention = mention.slice(2, -1); if (mention.startsWith('!')) {mention = mention.slice(1); }} mention = mention.split("").join(""); let user = (guild) ? guild.members.fetch(mention).catch(e=>{}) : ctx.guild.members.fetch(mention).catch(e=>{}); return (!user) ? null : user; }
+	
+	
+	fetchGuildUser(id, guild=null) { if (!id) return null; var [wc, client, ctx] = Holder; let mention = id; if (mention.startsWith('<@') && mention.endsWith('>')) {mention = mention.slice(2, -1); if (mention.startsWith('!')) {mention = mention.slice(1); }} mention = mention.split("").join(""); let user = (guild) ? guild.members.fetch(mention).catch(e=>{}) : ctx.guild.members.fetch(mention).catch(e=>{}); return (!user) ? null : user; }
+	
 	fetchGuildMember(id, guild=null) { return this.fetchGuildUser(id, guild); }
 	
+	
+	
 	fetchChannel(id) { if (!id) return null; let rawChannel = id; if (rawChannel.startsWith('<#') && rawChannel.endsWith('>')) {rawChannel = rawChannel.slice(2, -1); } rawChannel = rawChannel.split("").join(""); let channel = this.client.channels.fetch(rawChannel).catch(e=>{}); return (!channel) ? null : channel; }
+	
+	fetchGuildChannel(id, guild=null) { if (!id) return null; var [wc, client, ctx] = Holder; let rawChannel = id; if (rawChannel.startsWith('<#') && rawChannel.endsWith('>')) {rawChannel = rawChannel.slice(2, -1); } rawChannel = rawChannel.split("").join(""); let channel = (guild) ? guild.channels.fetch(rawChannel).catch(e=>{}) : ctx.guild.channels.fetch(rawChannel).catch(e=>{}); return (!channel) ? null : channel; }
 
-	fetchGuildChannel(id, guild=null) { if (!id) return null; var [psc, client, ctx] = Holder; let rawChannel = id; if (rawChannel.startsWith('<#') && rawChannel.endsWith('>')) {rawChannel = rawChannel.slice(2, -1); } rawChannel = rawChannel.split("").join(""); let channel = (guild) ? guild.channels.fetch(rawChannel).catch(e=>{}) : ctx.guild.channels.fetch(rawChannel).catch(e=>{}); return (!channel) ? null : channel; }
 
-	fetchRole(id, guild=null) { if (!id) return null; var [psc, client, ctx] = Holder; let rawRole = id; if (rawRole.startsWith('<@') && rawRole.endsWith('>')) {rawRole = rawRole.slice(2, -1); if (rawRole.startsWith('&')) {rawRole = rawRole.slice(1); }} rawRole = rawRole.split("").join(""); let role = (guild) ? guild.roles.fetch(rawRole).catch(e=>{}) : ctx.guild.roles.fetch(rawRole).catch(e=>{}); return (!role) ? null : role; }
+
+	fetchRole(id, guild=null) { if (!id) return null; var [wc, client, ctx] = Holder; let rawRole = id; if (rawRole.startsWith('<@') && rawRole.endsWith('>')) {rawRole = rawRole.slice(2, -1); if (rawRole.startsWith('&')) {rawRole = rawRole.slice(1); }} rawRole = rawRole.split("").join(""); let role = (guild) ? guild.roles.fetch(rawRole).catch(e=>{}) : ctx.guild.roles.fetch(rawRole).catch(e=>{}); return (!role) ? null : role; }
+	
 	fetchGuildRole(id, guild=null) { return this.fetchRole(id, guild); }
+	
+	
 	
 	fetchGuild(id) { if (!id) return null; let guild = this.client.guilds.fetch(id).catch(e=>{}); return (!guild) ? null : guild; }
 
-	fetchMessage(id, channel=null) { if (!id) return null; var [psc, client, ctx] = Holder; let message = (channel) ? channel.messages.fetch(id).catch(e=>{}) : ctx.channel.messages.fetch(id).catch(e=>{}); return (!message) ? null : message; }
 
-	fetchReply(message=null) { var [psc, client, ctx] = Holder; let msg = (message) ? message : ctx; let reply = (msg.reference) ? msg.channel.messages.fetch(msg.reference.messageId).catch(e=>{}) : null; return (!reply) ? null : reply; }
+
+	fetchMessage(id, channel=null) { if (!id) return null; var [wc, client, ctx] = Holder; let message = (channel) ? channel.messages.fetch(id).catch(e=>{}) : ctx.channel.messages.fetch(id).catch(e=>{}); return (!message) ? null : message; }
+
+
+
+	fetchReply(message=null) { var [wc, client, ctx] = Holder; let msg = (message) ? message : ctx; let reply = (msg.reference) ? msg.channel.messages.fetch(msg.reference.messageId).catch(e=>{}) : null; return (!reply) ? null : reply; }
 	
-	parseEmoji(emoji) { 
+	
+	
+	parseEmoji(emoji) {
 		if (!emoji) return null;
 		var emojiInfo = {};
 
@@ -712,6 +1037,7 @@ class PSClient {
 		}
 	}
 	
+	
 	parseSticker(sticker) {
 		if (!sticker) return null;
 
@@ -726,11 +1052,13 @@ class PSClient {
 		return thing;
 	}
 
+
 	
 	/* sleeps */
 	sleep(time) { return new Promise(resolve => setTimeout(resolve, time*1000)); }
 	
 	sleepMs(time) { return new Promise(resolve => setTimeout(resolve, time)); }
+
 
 	
 	/* random */
@@ -738,12 +1066,15 @@ class PSClient {
 		number(min, max) {
 			return Math.floor(Math.random() * (max - min + 1) ) + min;
 		}
+		
 		int(min, max) { return this.number(min, max); }
 
 		choice(array) {
 			return array[Math.floor(Math.random() * (Number(array.length)))];
 		}
 	}
+
+
 
 	/* time */
 	time = new class {
@@ -758,6 +1089,7 @@ class PSClient {
 			longDT(date) { return `<t:${Math.round(new Date(date).getTime() / 1000)}:F>` }
 			relative(date) { return `<t:${Math.round(new Date(date).getTime() / 1000)}:R>` }
 		}
+		
 		now = new class {
 			get embed() { return new Date().toISOString(); }
 			get default() { return `<t:${Math.round(new Date().getTime() / 1000)}>` }
@@ -769,6 +1101,7 @@ class PSClient {
 			get longDT() { return `<t:${Math.round(new Date().getTime() / 1000)}:F>` }
 			get relative() { return `<t:${Math.round(new Date().getTime() / 1000)}:R>` }
 		}
+		
 		parse(string) {
 			if (typeof string != "string") {
 				return parseFloat(string);
@@ -785,6 +1118,7 @@ class PSClient {
     		else if (thing == "y") { return parseFloat(t.join(""))*60*60*24*365; }
     		else { return parseFloat(string); }
 		}
+		
 		format(string) {
     		let t = string.split("");
     		let thing = t.pop();
@@ -798,15 +1132,17 @@ class PSClient {
     		else if (thing == "y") { return `${t.join("")} years`; }
 		}
 	}
+	
 	date = this.time;
 	times = this.time;
+	
 	
 	
 	/* voice */
 	voice = new class {
 		fetch = async function(user, guild=null) {
-			var [psc, client, ctx] = Holder;
-			let vcs = await psc.guild.VCs(guild);
+			var [wc, client, ctx] = Holder;
+			let vcs = await wc.guild.VCs(guild);
 			for (let i = 0; i < vcs.length; i++) {
 				let channel = vcs[i];
 
@@ -814,11 +1150,12 @@ class PSClient {
 			}
 			return null;
 		}
+		
 		find(user, func) { return this.fetch(user, func); }
 		
 		mute = async function(user, guild=null) {
-			var [psc, client, ctx] = Holder;
-			let channel = await psc.voice.fetch(user, guild);
+			var [wc, client, ctx] = Holder;
+			let channel = await wc.voice.fetch(user, guild);
 
 			if (channel.members.has(user.id)) {
 				let vcUser = channel.members.get(user.id);
@@ -827,8 +1164,8 @@ class PSClient {
 		}
 
 		unmute = async function(user, guild=null) {
-			var [psc, client, ctx] = Holder;
-			let channel = await psc.voice.fetch(user, guild);
+			var [wc, client, ctx] = Holder;
+			let channel = await wc.voice.fetch(user, guild);
 
 			if (channel.members.has(user.id)) {
 				let vcUser = channel.members.get(user.id);
@@ -837,8 +1174,8 @@ class PSClient {
 		}
 
 		deafen = async function(user, guild=null) {
-			var [psc, client, ctx] = Holder;
-			let channel = await psc.voice.fetch(user, guild);
+			var [wc, client, ctx] = Holder;
+			let channel = await wc.voice.fetch(user, guild);
 
 			if (channel.members.has(user.id)) {
 				let vcUser = channel.members.get(user.id);
@@ -847,8 +1184,8 @@ class PSClient {
 		}
 
 		undeafen = async function(user, guild=null) {
-			var [psc, client, ctx] = Holder;
-			let channel = await psc.voice.fetch(user, guild);
+			var [wc, client, ctx] = Holder;
+			let channel = await wc.voice.fetch(user, guild);
 
 			if (channel.members.has(user.id)) {
 				let vcUser = channel.members.get(user.id);
@@ -857,8 +1194,8 @@ class PSClient {
 		}
 
 		lockUser = async function(user, guild=null) {
-			var [psc, client, ctx] = Holder;
-			let channel = await psc.voice.fetch(user, guild);
+			var [wc, client, ctx] = Holder;
+			let channel = await wc.voice.fetch(user, guild);
 
 			if (channel.members.has(user.id)) {
 				let vcUser = channel.members.get(user.id);
@@ -868,8 +1205,8 @@ class PSClient {
 		}
 
 		unlockUser = async function(user, guild=null) {
-			var [psc, client, ctx] = Holder;
-			let channel = await psc.voice.fetch(user, guild);
+			var [wc, client, ctx] = Holder;
+			let channel = await wc.voice.fetch(user, guild);
 
 			if (channel.members.has(user.id)) {
 				let vcUser = channel.members.get(user.id);
@@ -879,19 +1216,19 @@ class PSClient {
 		}
 		
 		lock = async function(channel, guild=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			let vc = (guild) ? await ctx.guild.channels.fetch(channel.id) : await ctx.guild.channels.fetch(channel.id);
 			vc.members.forEach( (user) => {
-				user.voice.setMute(true); 
+				user.voice.setMute(true);
 				user.voice.setDeaf(true);
 			});
 		}
 
 		unlock = async function(channel, guild=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			let vc = (guild) ? await ctx.guild.channels.fetch(channel.id) : await ctx.guild.channels.fetch(channel.id);
 			vc.members.forEach( (user) => {
-				user.voice.setMute(false); 
+				user.voice.setMute(false);
 				user.voice.setDeaf(false);
 			});
 		}
@@ -910,130 +1247,132 @@ class PSClient {
 		}
 	}
 	
+	
+	
 	/* guild */
 	guild = new class {
 		memberCount = async function(guild=null) {
-			var [psc, cilent, ctx] = Holder;
-			let stuff = await psc.guild.members(guild);
+			var [wc, cilent, ctx] = Holder;
+			let stuff = await wc.guild.members(guild);
 			return stuff.length;
 		}
 
 		userCount = async function(guild=null) {
-			var [psc, cilent, ctx] = Holder;
-			let stuff = await psc.guild.users(guild);
+			var [wc, cilent, ctx] = Holder;
+			let stuff = await wc.guild.users(guild);
 			return stuff.length;
 		}
 
 		botCount = async function(guild=null) {
-			var [psc, cilent, ctx] = Holder;
-			let stuff = await psc.guild.bots(guild);
+			var [wc, cilent, ctx] = Holder;
+			let stuff = await wc.guild.bots(guild);
 			return stuff.length;
 		}
 		
 		roleCount = async function(guild=null) {
-			var [psc, cilent, ctx] = Holder;
-			let stuff = await psc.guild.roles(guild);
+			var [wc, cilent, ctx] = Holder;
+			let stuff = await wc.guild.roles(guild);
 			return stuff.length;
 		}
 
 		stuffCount = async function(guild=null) {
-			var [psc, cilent, ctx] = Holder;
-			let stuff = await psc.guild.stuff(guild);
+			var [wc, cilent, ctx] = Holder;
+			let stuff = await wc.guild.stuff(guild);
 			return stuff.length;
 		}
 		
 		channelCount = async function(guild=null) {
-			var [psc, cilent, ctx] = Holder;
-			let stuff = await psc.guild.channels(guild);
+			var [wc, cilent, ctx] = Holder;
+			let stuff = await wc.guild.channels(guild);
 			return stuff.length;
 		}
 
 		textChannelCount = async function(guild=null) {
-			var [psc, cilent, ctx] = Holder;
-			let stuff = await psc.guild.textChannels(guild);
+			var [wc, cilent, ctx] = Holder;
+			let stuff = await wc.guild.textChannels(guild);
 			return stuff.length;
 		}
 		TCCount = async function(guild=null) { return this.textChannelCount(guild); }
 
 		voiceChannelCount = async function(guild=null) {
-			var [psc, cilent, ctx] = Holder;
-			let stuff = await psc.guild.voiceChannels(guild);
+			var [wc, cilent, ctx] = Holder;
+			let stuff = await wc.guild.voiceChannels(guild);
 			return stuff.length;
 		}
 		VCCount = async function(guild=null) { return this.voiceChannelCount(guild); }
 
 		threadChannelCount = async function(guild=null) {
-			var [psc, cilent, ctx] = Holder;
-			let stuff = await psc.guild.threadChannels(guild);
+			var [wc, cilent, ctx] = Holder;
+			let stuff = await wc.guild.threadChannels(guild);
 			return stuff.length;
 		}
 		threadCount = async function(guild=null) { return this.threadChannelCount(guild); }
 
 		categoryCount = async function(guild=null) {
-			var [psc, cilent, ctx] = Holder;
-			let stuff = await psc.guild.categories(guild);
+			var [wc, cilent, ctx] = Holder;
+			let stuff = await wc.guild.categories(guild);
 			return stuff.length;
 		}
 		
 		emojiCount = async function(guild=null) {
-			var [psc, cilent, ctx] = Holder;
-			let stuff = await psc.guild.emojis(guild);
+			var [wc, cilent, ctx] = Holder;
+			let stuff = await wc.guild.emojis(guild);
 			return stuff.length;
 		}
 		
 		stickerCount = async function(guild=null) {
-			var [psc, cilent, ctx] = Holder;
-			let stuff = await psc.guild.stickers(guild);
+			var [wc, cilent, ctx] = Holder;
+			let stuff = await wc.guild.stickers(guild);
 			return stuff.length;
 		}
 
 		members = async function(guild=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			
 			if (!guild) return Soup.from(await ctx.guild.members.fetch());
 			else return Soup.from(await guild.members.fetch());
 		}
 
 		users = async function(guild=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			var members;
 			
 			if (!guild) members = Soup.from(await ctx.guild.members.fetch());
 			else members = Soup.from(await guild.members.fetch());
 
 			return members.filter( (id) => {
-				return !psc.fetchUser(id).bot;
+				return !wc.fetchUser(id).bot;
 			});
 		}
 
 		bots = async function(guild=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			var members;
 			
 			if (!guild) members = Soup.from(await ctx.guild.members.fetch());
 			else members = Soup.from(await guild.members.fetch());
 
 			return members.filter( (id) => {
-				return psc.fetchUser(id).bot;
+				return wc.fetchUser(id).bot;
 			});
 		}
 
 		roles = async function(guild=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			
 			if (!guild) return Soup.from(await ctx.guild.roles.fetch());
 			else return Soup.from(await guild.roles.fetch());
 		}
 
 		stuff = async function(guild=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			
 			if (!guild) return Soup.from(await ctx.guild.channels.fetch());
 			else return Soup.from(await guild.channels.fetch());
 		}
 
 		channels = async function(guild=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			var channels;
 			
 			if (!guild) channels = Soup.from(await ctx.guild.channels.fetch());
@@ -1045,7 +1384,7 @@ class PSClient {
 		}
 
 		categories = async function(guild=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			var channels;
 			
 			if (!guild) channels = Soup.from(await ctx.guild.channels.fetch());
@@ -1057,7 +1396,7 @@ class PSClient {
 		}
 
 		textChannels = async function(guild=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			var channels;
 			
 			if (!guild) channels = Soup.from(await ctx.guild.channels.fetch());
@@ -1070,7 +1409,7 @@ class PSClient {
 		TCs = async function(guild=null) { return this.textChannels(guild); }
 
 		voiceChannels = async function(guild=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			var channels;
 			
 			if (!guild) channels = Soup.from(await ctx.guild.channels.fetch());
@@ -1083,7 +1422,7 @@ class PSClient {
 		VCs = async function(guild=null) { return this.voiceChannels(guild); }
 
 		threadChannels = async function(guild=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			var channels;
 			
 			if (!guild) channels = Soup.from(await ctx.guild.channels.fetch());
@@ -1096,14 +1435,14 @@ class PSClient {
 		threads = async function(guild=null) { return this.threadChannels(guild); }
 		
 		emojis = async function(guild=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			
 			if (!guild) return Soup.from(await ctx.guild.emojis.fetch());
 			else return Soup.from(await guild.emojis.fetch());
 		}
 
 		stickers = async function(guild=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			
 			if (!guild) return Soup.from(await ctx.guild.stickers.fetch());
 			else return Soup.from(await guild.stickers.fetch());
@@ -1111,10 +1450,11 @@ class PSClient {
 	}
 	server = this.guild;
 
+
 	reply(content, extras=null) {
 		return Fuck();
 		async function Fuck() {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			if (content && extras) {
 				extras["content"] = content; var message = await ctx.reply(extras);
 			}
@@ -1125,16 +1465,18 @@ class PSClient {
 				var message = await ctx.reply(content, extras);
 			}
 			if (extras && extras.deleteAfter) {
-				setTimeout( () => { message.delete().catch(e=>{}); }, psc.time.parse(extras.deleteAfter)*1000);
+				setTimeout( () => { message.delete().catch(e=>{}); }, wc.time.parse(extras.deleteAfter)*1000);
 			}
 			return message;
 		}
 	}
+	
 		
 	send(content, extras=null) {
 		return Fuck();
+		
 		async function Fuck() {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			if (content && extras) {
 				extras["content"] = content; var message = await ctx.channel.send(extras);
 			}
@@ -1145,17 +1487,19 @@ class PSClient {
 				var message = await ctx.channel.send(content, extras);
 			}
 			if (extras && extras.deleteAfter) {
-				setTimeout( () => { message.delete().catch(e=>{}); }, psc.time.parse(extras.deleteAfter)*1000);
+				setTimeout( () => { message.delete().catch(e=>{}); }, wc.time.parse(extras.deleteAfter)*1000);
 			}
 			return message;
 		}
 	}
 	
+	
+	
 	/* channel */
 	channel = new class {
 		permissions = new class {
 			sync(channel=null) {
-				var [psc, client, ctx] = Holder;
+				var [wc, client, ctx] = Holder;
 				if (!channel) {
 					ctx.channel.lockPermissions();
 				} else {
@@ -1164,7 +1508,7 @@ class PSClient {
 			}
 
 			set(array, channel=null) {
-				var [psc, client, ctx] = Holder;
+				var [wc, client, ctx] = Holder;
 				if (!channel) {
 					ctx.channel.permissionOverwrites.set(array);
 				} else {
@@ -1173,7 +1517,7 @@ class PSClient {
 			}
 
 			edit(id, permissions, channel=null) {
-				var [psc, client, ctx] = Holder;
+				var [wc, client, ctx] = Holder;
 				if (!channel) {
 					ctx.channel.permissionOverwrites.edit(id, permissions);
 				} else {
@@ -1182,7 +1526,7 @@ class PSClient {
 			}
 
 			delete(id, channel=null) {
-				var [psc, client, ctx] = Holder;
+				var [wc, client, ctx] = Holder;
 				if (!channel) {
 					ctx.channel.permissionOverwrites.delete(id);
 				} else {
@@ -1193,8 +1537,9 @@ class PSClient {
 		
 		send(content, extras=null) {
 			return Fuck();
+			
 			async function Fuck() {
-				var [psc, client, ctx] = Holder;
+				var [wc, client, ctx] = Holder;
 				if (content && extras) {
 					extras["content"] = content; var message = await ctx.channel.send(extras);
 				}
@@ -1205,14 +1550,14 @@ class PSClient {
 					var message = await ctx.channel.send(content, extras);
 				}
 				if (extras && extras.deleteAfter) {
-					setTimeout( () => { message.delete(); }, psc.time.parse(extras.deleteAfter)*1000);
+					setTimeout( () => { message.delete(); }, wc.time.parse(extras.deleteAfter)*1000);
 				}
 				return message;
 			}
 		}
 		
 		purge(amount, channel=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			if (!channel) {
 				ctx.channel.bulkDelete(amount);
 			} else {
@@ -1221,7 +1566,7 @@ class PSClient {
 		}
 		
 		lock(channel=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			if (!channel) {
 				ctx.channel.permissionOverwrites.edit(ctx.guild.roles.everyone.id, { SendMessages: false });
 			} else {
@@ -1230,7 +1575,7 @@ class PSClient {
 		}
 
 		unlock(channel=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			if (!channel) {
 				ctx.channel.permissionOverwrites.edit(ctx.guild.roles.everyone.id, { SendMessages: true });
 			} else {
@@ -1239,7 +1584,7 @@ class PSClient {
 		}
 		
 		setSlowmode(time, channel=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			if (!channel) {
 				ctx.channel.setRateLimitPerUser(time);
 			} else {
@@ -1248,7 +1593,7 @@ class PSClient {
 		}
 
 		removeSlowmode(channel=null) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			if (!channel) {
 				ctx.channel.setRateLimitPerUser(0);
 			} else {
@@ -1258,15 +1603,16 @@ class PSClient {
 		noSlowmode(channel=null) { return this.removeSlowmode(channel); }
 
 		async messages(channel=null, limit=100) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			
 			if (!channel) return Soup.from(await ctx.channel.messages.fetch({ limit: limit }));
 			else return Soup.from(await channel.members.fetch({ limit: limit }));
 		}
 	}
 
-	/* users and permissions */
 
+
+	/* users and permissions */
 	permissionList = {
 		"createInvite": "CreateInstantInvite",
 		"kickMembers": "KickMembers",
@@ -1367,9 +1713,10 @@ class PSClient {
 		"activities": "UseEmbeddedActivities"
 	};
 	
+	
 	user = new class {
 		avatar(user=null, dynamic=false) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 			if (!user) {
 				return ctx.author.displayAvatarURL(dynamic);
 			} else {
@@ -1381,20 +1728,20 @@ class PSClient {
 		avatar_url(user=null, dynamic=false) { return this.avatar(user, dynamic); }
 
 		ban(user, extras={reason:null, time:null, deleteTo:null}) {
-			var [psc, client, ctx] = Holder;
+			var [wc, client, ctx] = Holder;
 
 			if (extras.time) {
 				setTimeout( () => {
 					ctx.guild.bans.remove(user.id);
-				}, psc.time.parse(extras.time)*1000);
+				}, wc.time.parse(extras.time)*1000);
 			}
 
-			return ctx.guild.bans.create(user.id, {reason: extras.reason, deleteMessageSeconds: psc.time.parse(extras.deleteTo)});
+			return ctx.guild.bans.create(user.id, {reason: extras.reason, deleteMessageSeconds: wc.time.parse(extras.deleteTo)});
 		}
 		
 		roles = new class {
 			cache(user=null) {
-				var [psc, client, ctx] = Holder;
+				var [wc, client, ctx] = Holder;
 				if (!user) {
 					return ctx.member.roles.cache;
 				} else {
@@ -1403,7 +1750,7 @@ class PSClient {
 			}
 			
 			list(user=null) {
-				var [psc, client, ctx] = Holder;
+				var [wc, client, ctx] = Holder;
 				if (!user) {
 					return Array.from(ctx.member.roles.cache, (role) => {
 						return role[1].name;
@@ -1416,7 +1763,7 @@ class PSClient {
 			}
 
 			ids(user=null) {
-				var [psc, client, ctx] = Holder;
+				var [wc, client, ctx] = Holder;
 				if (!user) {
 					return Array.from(ctx.member.roles.cache, (role) => {
 						return role[0];
@@ -1429,7 +1776,7 @@ class PSClient {
 			}
 			
 			has(roleId, user=null) {
-				var [psc, client, ctx] = Holder;
+				var [wc, client, ctx] = Holder;
 				if (!user) {
 					return ctx.member.roles.cache.has(roleId);
 				} else {
@@ -1438,7 +1785,7 @@ class PSClient {
 			}
 
 			hasName(name, user=null) {
-				var [psc, client, ctx] = Holder;
+				var [wc, client, ctx] = Holder;
 				if (!user) {
 					return ctx.member.roles.cache.some(role => role.name == name);
 				} else {
@@ -1447,9 +1794,10 @@ class PSClient {
 			}
 		}
 
+
 		permissions = new class {
 			cache(user=null) {
-				var [psc, client, ctx] = Holder;
+				var [wc, client, ctx] = Holder;
 				if (!user) {
 					return ctx.member.permissions.serialize();
 				} else {
@@ -1458,7 +1806,7 @@ class PSClient {
 			}
 
 			list(user=null) {
-				var [psc, client, ctx] = Holder;
+				var [wc, client, ctx] = Holder;
 				if (!user) {
 					return ctx.member.permissions.toArray();
 				} else {
@@ -1467,13 +1815,13 @@ class PSClient {
 			}
 
 			has(permissions, user=null) {
-				var [psc, client, ctx] = Holder;
+				var [wc, client, ctx] = Holder;
 				var perms = [];
 				
 				permissions.forEach( (perm) => {
-					let permName = (Object.keys(psc.permissionList).includes(perm))
-						? psc.permissionList[perm]
-					: (Object.values(psc.permissionList).includes(perm))
+					let permName = (Object.keys(wc.permissionList).includes(perm))
+						? wc.permissionList[perm]
+					: (Object.values(wc.permissionList).includes(perm))
 						? perm
 					: function() { throw new CoolError("Has Permissions", "Permission does not exist.") }();
 
@@ -1512,7 +1860,7 @@ class PSClient {
 		}
 		
 		hasRoleName(name, user=null) {
-			return this.roles.hasName(name, user);	
+			return this.roles.hasName(name, user);
 		}
 
 		permissionCache(user=null) {
@@ -1536,6 +1884,7 @@ class PSClient {
 	member = this.user;
 	author = this.user;
 	
+	
     /* running */
     run(token) {
         this.client.login(token);
@@ -1546,23 +1895,27 @@ class PSClient {
     }
 }
 
-function ClientHandler(psc, client) {
-	console.log("Commands Enabled");
+
+function ClientHandler(wc, client) {
+	console.log("Will Client Started");
+	
 	client.on("messageCreate", async (ctx) => {
-		Holder = [psc, client, ctx];
-		psc.commandHandler(ctx);
+		Holder = [wc, client, ctx];
+		wc.commandHandler(ctx);
 	});
 }
 
+
 function FuckPromises(stupids, func, user=false) {
-	var [psc, client, ctx] = Holder;
+	var [wc, client, ctx] = Holder;
 	var stupidList = [];
 	stupids.forEach( (stupid) => {
-		stupidList.push( (user) ? psc.fetchUser(stupid.id) : stupid);
+		stupidList.push( (user) ? wc.fetchUser(stupid.id) : stupid);
 	});
 
 	return func(stupidList);
 }
+
 
 class Embed {
 	constructor(obj) {
@@ -1607,6 +1960,7 @@ class Embed {
 	}
 }
 
+
 class Selection {
 	constructor(obj) {
 		obj.type = 3;
@@ -1626,6 +1980,9 @@ class Selection {
 		return obj;
 	}
 }
+
+
+
 var SelectMenu = this.Selection;
 
 function buttonStyle(style) {
@@ -1644,6 +2001,7 @@ function buttonStyle(style) {
 	: null;
 }
 
+
 class ActionRow {
 	constructor(array) {
 		return { type: 1, components: array };
@@ -1651,9 +2009,10 @@ class ActionRow {
 }
 var Row = ActionRow;
 
+
 class Button {
 	constructor(obj) {
-		var [psc] = Holder;
+		var [wc] = Holder;
 		obj.type = 2;
 		if (obj.id) {
 			obj.custom_id = obj.id;
@@ -1666,4 +2025,5 @@ class Button {
 	}
 }
 
-module.exports = { PSClient, Embed, ActionRow, Row, Button, Selection, SelectMenu, Stew, Soup };
+
+module.exports = { WillClient, Embed, ActionRow, Row, Button, Selection, SelectMenu, Stew, Soup };
