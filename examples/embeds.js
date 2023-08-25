@@ -1,21 +1,21 @@
 const { Client } = require('discord.js');
 const client = new Client({ /* your stuff here */ });
-const { PSClient } = require('discordpps');
-const psc = new PSClient({ client: client, prefix: "." });
+const { WillClient } = require('willclient');
+const wc = new WillClient({ client: client, prefix: "." });
 
 const config = require('./config.json');
 
-psc.event("ready", (ctx) => {
+wc.event("ready", (ctx) => {
     console.log(`Logged in as ${ctx.user.tag}`);
 });
 
 /* commands */
 
-psc.command( {name: "embed"}, async (ctx, cmd) => {
-    let embed = new psc.Embed({
+wc.command( {name: "embed"}, async (ctx, cmd) => {
+    let embed = new wc.Embed({
         title: "title",
         description: "description",
-        color: psc.colors.blurple,
+        color: wc.colors.blurple,
         
         fields: [
             {name: "Field A", value: "value", inline: true},
@@ -23,7 +23,7 @@ psc.command( {name: "embed"}, async (ctx, cmd) => {
         ],
         
         footer: "footer",
-        timestamp: psc.time.now.embed
+        timestamp: wc.time.now.embed
     });
     
     ctx.reply( {embeds: [embed]} );
