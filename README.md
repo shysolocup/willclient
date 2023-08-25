@@ -2,24 +2,24 @@
 
 <div align="center" text-align="center">
 	<br />
-	<img src="https://github.com/nuttmegg/psc/blob/main/assets/logo_white.png">
+	<img src="https://github.com/paigeroid/willclient/blob/main/assets/logo_white.png">
 	<br />
-	<a href="https://www.npmjs.com/package/will-client"><img src="https://img.shields.io/npm/v/will-client?style=flat&color=red&logo=npm&logoColor=white" alt="version" />
-	<a href="https://www.npmjs.com/package/will-client"><img src="https://img.shields.io/npm/dt/will-client?style=flat&color=green&logo=docusign&logoColor=white" alt="downloads" />
+	<a href="https://www.npmjs.com/package/willclient"><img src="https://img.shields.io/npm/v/willclient?style=flat&color=red&logo=npm&logoColor=white" alt="version" />
+	<a href="https://www.npmjs.com/package/willclient"><img src="https://img.shields.io/npm/dt/willclient?style=flat&color=green&logo=docusign&logoColor=white" alt="downloads" />
 	<a href="https://nodejs.org/en/"><img src="https://img.shields.io/node/v/discord.js?logo=node.js&logoColor=white" alt="node.js version" />
 	<a href="https://discord.js.org/"><img src="https://img.shields.io/badge/discord.js-v14.7.1-blue?style=flat&color=7289da&logo=discord&logoColor=white" alt="discord.js version" /></a>
-	<a href="https://github.com/paigeroid/will-client/discussions"><img src="https://img.shields.io/github/discussions/paigeroid/will-client?logo=google%20chat&logoColor=white" alt="discussions" />
-	<a href="https://github.com/paigeroid/will-client/issues"><img src="https://img.shields.io/github/issues/paigeroid/will-client" alt="issues" />
+	<a href="https://github.com/paigeroid/willclient/discussions"><img src="https://img.shields.io/github/discussions/paigeroid/willclient?logo=google%20chat&logoColor=white" alt="discussions" />
+	<a href="https://github.com/paigeroid/willclient/issues"><img src="https://img.shields.io/github/issues/paigeroid/willclient" alt="issues" />
 	
 
-Will Client (WC) is a combination of [Discord.JS](https://discord.js.org/) and [Discord.PY](https://github.com/Rapptz/discord.py) made in [Node.JS](https://nodejs.org/en/) to solve most of the annoying parts of Discord.JS and possibly welcome users into Node.JS
+WillClient (WC) is a combination of [Discord.JS](https://discord.js.org/) and [Discord.PY](https://github.com/Rapptz/discord.py) made in [Node.JS](https://nodejs.org/en/) to solve most of the annoying parts of Discord.JS and possibly welcome users into Node.JS
 
 <br>
 
 *__THIS IS A VERY EARLY VERSION AND I WILL UPDATE IT OVER TIME__*<br><br>
 
-for a look at some examples check out the [examples folder](https://github.com/paigeroid/will-client/tree/main/examples)<br>
-for a full look at everything go check out the [wiki pages](https://github.com/paigeroid/will-client/wiki)
+for a look at some examples check out the [examples folder](https://github.com/paigeroid/willclient/tree/main/examples)<br>
+for a full look at everything go check out the [wiki pages](https://github.com/paigeroid/willclient/wiki)
 
 </div>
 
@@ -32,7 +32,7 @@ for a full look at everything go check out the [wiki pages](https://github.com/p
 ## Usage
 WC simplifies prefix commands and is heavily inspried by the design and functionality of Discord.PY while still being made with Discord.JS
 ```js
-// wc
+// willclient
 wc.command( "ping", async (ctx) => {
 	await ctx.reply("Pong!");		
 });
@@ -72,10 +72,10 @@ wc.command( {name: "ping", cooldown: "30s"}, (ctx, cmd) => {
 
 ## Installation
 ```console
-npm i will-client
+npm i willclient
 ```
 ```console
-npm i paigeroid/will-client
+npm i paigeroid/willclient
 ```
 
 <br>
@@ -92,7 +92,7 @@ const client = new Client({
 ### **WC Client**
 once you have your Discord.JS client you can add in WC
 ```js
-const { WillClient } = require('will-client');
+const { WillClient } = require('willclient');
 const wc = new WillClient({
 	client: client,
 	prefix: "!" 
