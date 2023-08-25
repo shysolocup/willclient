@@ -22,8 +22,8 @@
     "keywords": [
         "discord.js",
         "discord.py",
-        "discord",
-        "psc"
+        "willclient",
+        "discord"
     ],
     "homepage": "https://github.com/paigeroid/willclient",
     "main": "./index.js"
