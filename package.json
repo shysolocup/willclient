@@ -2,7 +2,7 @@
     "name": "willclient",
     "version": "0.6.0",
     "author": "paigeroid",
-    "description": "A combination of Discord.JS and Discord.PY made in Node.JS",
+    "description": "Custom Discord API mod made in Node.JS that combines elements from Discord.PY and Discord.JS",
     "dependencies": {
         "discord.js": "latest",
         "@discordjs/voice": "latest",
