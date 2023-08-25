@@ -30,7 +30,7 @@ for a full look at everything go check out the [wiki pages](https://github.com/p
 <br>
 		
 ## Usage
-WC simplifies prefix commands and is heavily inspried by the design and functionality of Discord.PY while still being made with Discord.JS
+WillClient simplifies prefix commands and is heavily inspried by the design and functionality of Discord.PY while still being made with Discord.JS
 ```js
 // willclient
 wc.command( "ping", async (ctx) => {
