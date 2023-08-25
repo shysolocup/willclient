@@ -1,6 +1,6 @@
 /*
-	:: Will Client :: Version 0.6.0 | 08/25/23 ::
-	https://github.com/paigeroid/will-client
+	:: WillClient :: Version 0.6.0 | 08/25/23 ::
+	https://github.com/paigeroid/willclient
 
 */
 
