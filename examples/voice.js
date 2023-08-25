@@ -1,44 +1,44 @@
 const { Client } = require('discord.js');
 const client = new Client({ /* your stuff here */ });
-const { PSClient } = require('discordpps');
-const psc = new PSClient({ client: client, prefix: "." });
+const { WillClient } = require('willclient');
+const wc = new PSClient({ client: client, prefix: "." });
 
 const config = require('./config.json');
 
-psc.event("ready", (ctx) => {
+wc.event("ready", (ctx) => {
     console.log(`Logged in as ${ctx.user.tag}`);
 });
 
 /* commands */
 
-psc.command( {name: "join"}, async (ctx, cmd) => {
-    let channel = psc.fetchChannel("id");
+wc.command( {name: "join"}, async (ctx, cmd) => {
+    let channel = await wc.voice.fetch(ctx.author, ctx.guild)
     
-    psc.voice.join(channel);
+    wc.voice.join(channel);
     
     ctx.reply(`Joined ${channel.name}!`);
 });
 
-psc.command( {name: "leave"}, async (ctx, cmd) => {
-    let channel = psc.fetchChannel("id");
+wc.command( {name: "leave"}, async (ctx, cmd) => {
+    let channel = await wc.voice.fetch(client.user, ctx.guild)
     
-    psc.voice.leave(channel);
+    wc.voice.leave(channel);
     
     ctx.reply(`Left ${channel.name}!`);
 });
 
-psc.command( {name: "lock"}, async (ctx, cmd) => {
-    let channel = psc.fetchChannel(cmd.args[0]); // channel given in the message either with id or with #channel
+wc.command( {name: "lock"}, async (ctx, cmd) => {
+    let channel = wc.fetchChannel(cmd.args[0]); // channel given in the message either with id or with #channel
     
-    psc.voice.lock(channel); // mutes and deafens everyone in the voice channel
+    wc.voice.lock(channel); // mutes and deafens everyone in the voice channel
     
     ctx.reply(`Locked ${channel.name}!`);
 });
 
-psc.command( {name: "unlock"}, async (ctx, cmd) => {
-    let channel = psc.fetchChannel(cmd.args[0]);
+wc.command( {name: "unlock"}, async (ctx, cmd) => {
+    let channel = wc.fetchChannel(cmd.args[0]);
     
-    psc.voice.unlock(channel); // mutes and deafens everyone in the voice channel
+    wc.voice.unlock(channel); // mutes and deafens everyone in the voice channel
     
     ctx.reply(`Unlocked ${channel.name}!`);
 });
