@@ -62,7 +62,7 @@ wc.command( "tagify", (ctx, cmd) => {
 And built in cooldowns
 ```js
 wc.command( {name: "ping", cooldown: "30s"}, (ctx, cmd) => {
-	if (cmd.onCooldown) return psc.reply("Command is on cooldown!", {deleteAfter: "3s"});
+	if (cmd.onCooldown) return wc.reply("Command is on cooldown!", {deleteAfter: "3s"});
 	
 	ctx.reply("Pong!");
 });
