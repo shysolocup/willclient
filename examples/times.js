@@ -1,29 +1,29 @@
 const { Client } = require('discord.js');
 const client = new Client({ /* your stuff here */ });
-const { PSClient } = require('discordpps');
-const psc = new PSClient({ client: discordClient, prefix: "." });
+const { WillClient } = require('willclient');
+const wc = new WillClient({ client: discordClient, prefix: "." });
 
 const config = require('./config.json');
 
-psc.event("ready", (ctx) => {
+wc.event("ready", (ctx) => {
     console.log(`Logged in as ${ctx.user.tag}`);
 });
 
 /* commands */
 
-psc.command( {name: "relative"}, async (ctx, cmd) => {
+wc.command( {name: "relative"}, async (ctx, cmd) => {
     if (cmd.args.length > 0) {
-        return ctx.reply(psc.time.set.relative(cmd.args.join(" ")));
+        return ctx.reply(wc.time.set.relative(cmd.args.join(" ")));
     }
     else {
-        return ctx.reply(psc.time.now.relative);
+        return ctx.reply(wc.time.now.relative);
     }
 });
 
-psc.command( {name: "embeds"}, async (ctx, cmd) => {
-    let embed = new psc.Embed({
+wc.command( {name: "embeds"}, async (ctx, cmd) => {
+    let embed = new wc.Embed({
         description: "this is the time right now:",
-        timestamp: psc.time.now.embed
+        timestamp: wc.time.now.embed
     });
     
     return ctx.reply({embeds: [embed]});
