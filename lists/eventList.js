@@ -1,3 +1,6 @@
+let eventList = {
+
+	
 // run bot
 "start": "ready",
 "run": "ready",
@@ -393,3 +396,7 @@
 	
 	// invalidated
 	"invalidated": "invalidated",
+
+}
+
+module.exports = { eventList }
