@@ -253,7 +253,7 @@ let eventList = {
 	"submitSelectMenu": "interactionCreate",
 	"selectSubmit": "interactionCreate",
 	"selectMenuSubmit": "interactionCreate",
-	"selectionSubmit": "interactionCreate"
+	"selectionSubmit": "interactionCreate",
 	
 	
 	
