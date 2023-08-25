@@ -12,7 +12,7 @@
 	<a href="https://github.com/paigeroid/willclient/issues"><img src="https://img.shields.io/github/issues/paigeroid/willclient" alt="issues" />
 	
 
-WillClient (WC) is a combination of [Discord.JS](https://discord.js.org/) and [Discord.PY](https://github.com/Rapptz/discord.py) made in [Node.JS](https://nodejs.org/en/) to solve most of the annoying parts of Discord.JS and possibly welcome users into Node.JS
+WillClient (WC) is a custom Discord API mod that combines elements from [Discord.JS](https://discord.js.org/) and [Discord.PY](https://github.com/Rapptz/discord.py) made in [Node.JS](https://nodejs.org/en/) to solve most of the annoying parts of Discord.JS and possibly welcome users into Node.JS
 
 <br>
 
