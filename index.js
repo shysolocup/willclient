@@ -618,7 +618,7 @@ class WillClient {
 			"submitSelectMenu": "interactionCreate",
 			"selectSubmit": "interactionCreate",
 			"selectMenuSubmit": "interactionCreate",
-			"selectionSubmit": "interactionCreate"
+			"selectionSubmit": "interactionCreate",
 			
 			
 			
@@ -1866,7 +1866,7 @@ class WillClient {
 			"useEmbeddedActivities": "UseEmbeddedActivities",
 			"useActivities": "UseEmbeddedActivities",
 			"embeddedActivities": "UseEmbeddedActivities",
-			"activities": "UseEmbeddedActivities"
+			"activities": "UseEmbeddedActivities",
 			
 			
 		
