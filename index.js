@@ -1614,103 +1614,266 @@ class WillClient {
 
 	/* users and permissions */
 	permissionList = {
-		"createInvite": "CreateInstantInvite",
-		"kickMembers": "KickMembers",
-		"kick": "KickMembers",
-		"banMembers": "BanMembers",
-		"ban": "BanMembers",
-		"moderateMembers": "ModerateMembers",
-		"moderate": "ModerateMembers",
-		"administrator": "Administrator",
-		"admin": "Administrator",
-		"manageChannels": "ManageChannels",
-		"manageGuild": "manageGuild",
-		"addReactions": "AddReactions",
-		"reactions": "AddReactions",
-		"react": "AddReactions",
-		"viewAuditLog": "ViewAuditLogs",
-		"viewLogs": "ViewAuditLogs",
-		"auditLogs": "ViewAuditLogs",
-		"logs": "ViewAuditLogs",
-		"prioritySpeaker": "PrioritySpeaker",
-		"stream": "Stream",
-		"viewChannel": "ViewChannel",
-		"sendMessages": "SendMessages",
-		"send": "SendMessages",
-		"message": "SendMessages",
-		"sendTTSMessages": "SendTTSMessages",
-		"sendTTS": "SendTTSMessages",
-		"manageMessages": "ManageMessages",
-		"embedLinks": "EmbedLinks",
-		"links": "EmbedLinks",
-		"attachFiles": "AttachFiles",
-		"sendFiles": "AttachFiles",
-		"files": "AttachFiles",
-		"readMessageHistory": "ReadMessageHistory",
-		"readHistory": "ReadMessageHistory",
-		"viewMessageHistory": "ReadMessageHistory",
-		"viewHistory": "ReadMessageHistory",
-		"mentionEveryone": "MentionEveryone",
-		"pingEveryone": "MentionEveryone",
-		"everyone": "MentionEveryone",
-		"useExternalEmojis": "UseExternalEmojis",
-		"externalEmojis": "UseExternalEmojis",
-		"useEmojis": "UseExternalEmojis",
-		"useExternalStickers": "UseExternalStickers",
-		"externalStickers": "UseExternalStickers",
-		"useStickers": "UseExternalStickers",
-		"viewGuildInsights": "ViewGuildInsights",
-		"guildInsights": "ViewGuildInsights",
-		"insights": "ViewGuildInsights",
-		"connect": "Connect",
-		"voiceConnect": "Connect",
-		"speak": "Speak",
-		"voiceSpeak": "Speak",
-		"muteMembers": "MuteMembers",
-		"mute": "MuteMembers",
-		"voiceMute": "MuteMembers",
-		"deafenMembers": "DeafenMembers",
-		"deafen": "DeafenMembers",
-		"voiceDeafen": "DeafenMembers",
-		"moveMembers": "MoveMembers",
-		"move": "MoveMembers",
-		"voiceMove": "MoveMembers",
-		"useVAD": "UseVAD",
-		"VAD": "UseVAD",
-		"changeNickname": "ChangeNickname",
-		"nickname": "ChangeNickname",
-		"manageNicknames": "ManageNickname",
-		"nicknames": "ManageNickname",
-		"manageRoles": "ManageRoles",
-		"roles": "ManageRoles",
-		"manageWebhooks": "ManageWebhooks",
-		"manageEmojisAndStickers": "ManageEmojisAndStickers",
-		"manageEmojis": "ManageEmojisAndStickers",
-		"manageStickers": "ManageEmojisAndStickers",
-		"emojis": "ManageEmojisAndStickers",
-		"stickers": "ManageEmojisAndStickers",
-		"emojisAndStickers": "ManageEmojisAndStickers",
-		"useApplicationCommands": "UseApplicationCommands",
-		"useCommands": "UseApplicationCommands",
-		"applicationCommands": "UseApplicationCommands",
-		"commands": "UseApplicationCommands",
-		"requestToSpeak": "RequestToSpeak",
-		"manageEvents": "ManageEvents",
-		"events": "ManageEvents",
-		"manageThreads": "ManageThreads",
-		"threads": "ManageThreads",
-		"createPublicThreads": "CreatePublicThreads",
-		"publicThreads": "CreatePublicThreads",
-		"createPrivateThreads": "CreatePrivateThreads",
-		"privateThreads": "CreatePrivateThreads",
-		"sendMessagesInThreads": "SendMessagesInThreads",
-		"sendThreadMessages": "SendMessagesInThreads",
-		"threadMessages": "SendMessagesInThreads",
-		"messageInThreads": "SendMessagesInThreads",
-		"useEmbeddedActivities": "UseEmbeddedActivities",
-		"useActivities": "UseEmbeddedActivities",
-		"embeddedActivities": "UseEmbeddedActivities",
-		"activities": "UseEmbeddedActivities"
+		
+		/* :: ADMINISTRATOR :: */
+			"administrator": "Administrator",
+			"admin": "Administrator",
+			
+			
+			
+		/* :: MESSAGES :: */
+		
+			// send messages
+			"sendMessages": "SendMessages",
+			"send": "SendMessages",
+			"message": "SendMessages",
+			
+			// send tts messages
+			"sendTTSMessages": "SendTTSMessages",
+			"sendTTS": "SendTTSMessages",
+			
+			// manage messages
+			"manageMessages": "ManageMessages",
+			
+			
+			
+		/* :: EMBEDS :: */
+		
+			// embed links
+			"embedLinks": "EmbedLinks",
+			"links": "EmbedLinks",
+			
+			// attach files
+			"attachFiles": "AttachFiles",
+			"sendFiles": "AttachFiles",
+			"files": "AttachFiles",
+			
+			
+		
+		/* :: MENTION :: */
+		
+			"mentionEveryone": "MentionEveryone",
+			"pingEveryone": "MentionEveryone",
+			"everyone": "MentionEveryone",
+			
+			
+			
+		/* :: NICKNAMES :: */
+		
+			// change nickname
+			"changeNickname": "ChangeNickname",
+			"changeNick": "ChangeNickname",
+			"nickname": "ChangeNickname",
+			"nick": "ChangeNickname",
+		
+			// manage nicknames
+			"manageNicknames": "ManageNickname",
+			"manageNickname": "ManageNickname",
+			"manageNicks": "ManageNickname",
+			"manageNick": "ManageNickname",
+			"nicknames": "ManageNickname",
+			"nicks": "ManageNickname",
+		
+		
+		
+		/* :: MEMBERS :: */
+		
+			// ban members
+			"banMembers": "BanMembers",
+			"banUsers": "BanMembers",
+			"ban": "BanMembers",
+			
+			// kick members
+			"kickMembers": "KickMembers",
+			"kickUsers": "KickMembers",
+			"kick": "KickMembers",
+		
+			// moderate members
+			"moderateMembers": "ModerateMembers",
+			"moderateUsers": "ModerateMembers",
+			"moderate": "ModerateMembers",
+			
+			
+		
+		/* :: CHANNELS :: */
+		
+			// manage channel
+			"manageChannels": "ManageChannels",
+			
+			// view channel
+			"viewChannel": "ViewChannel",
+			
+			
+		
+		/* :: ROLES :: */
+			
+			"manageRoles": "ManageRoles",
+			"roles": "ManageRoles",
+			
+			
+		
+		/* :: MESSAGE HISTORY :: */
+		
+			"readMessageHistory": "ReadMessageHistory",
+			"readHistory": "ReadMessageHistory",
+			"viewMessageHistory": "ReadMessageHistory",
+			"viewHistory": "ReadMessageHistory",
+		
+			
+		
+		/* :: GUILD :: */
+			
+			// manage guild
+			"manageGuild": "manageGuild",
+			
+			// guild insights
+			"viewGuildInsights": "ViewGuildInsights",
+			"guildInsights": "ViewGuildInsights",
+			"insights": "ViewGuildInsights",
+			
+			
+			
+			
+		/* :: REACTIONS :: */
+		
+			"addReactions": "AddReactions",
+			"reactions": "AddReactions",
+			"react": "AddReactions",
+			
+			
+		
+		/* :: EMOJIS & STICKERS :: */
+			
+			// use external emojis
+			"useExternalEmojis": "UseExternalEmojis",
+			"externalEmojis": "UseExternalEmojis",
+			"useEmojis": "UseExternalEmojis",
+			
+			// manage emojis and stickers
+			"manageEmojisAndStickers": "ManageEmojisAndStickers",
+			"emojisAndStickers": "ManageEmojisAndStickers",
+			
+			// manage emojis
+			"manageEmojis": "ManageEmojisAndStickers",
+			"emojis": "ManageEmojisAndStickers",
+			
+			// manage stickers
+			"manageStickers": "ManageEmojisAndStickers",
+			"stickers": "ManageEmojisAndStickers",
+		
+			
+			
+			
+		/* :: AUDIT LOGS :: */
+		
+			"viewAuditLog": "ViewAuditLogs",
+			"viewLogs": "ViewAuditLogs",
+			"auditLogs": "ViewAuditLogs",
+			"logs": "ViewAuditLogs",
+			
+		
+		
+		/* :: INVITES :: */
+			
+			"createInvite": "CreateInstantInvite",
+			
+			
+		
+		
+		/* :: VOICE :: */
+		
+			// connect
+			"connect": "Connect",
+			
+			// speak
+			"speak": "Speak",
+			
+			// stream
+			"stream": "Stream",
+			
+			// VAD
+			"VAD": "UseVAD",
+			"useVAD": "UseVAD",
+			
+			// move members
+			"move": "MoveMembers",
+			"moveMembers": "MoveMembers",
+			"moveUsers": "MoveMembers",
+		
+			// mute members
+			"mute": "MuteMembers",
+			"muteMembers": "MuteMembers",
+			"muteUsers": "MuteMembers",
+			
+			// deafean members
+			"deafen": "DeafenMembers",
+			"deafenMembers": "DeafenMembers",
+			"deafenUsers": "DeafenMembers",
+			
+			// priority speaker
+			"prioritySpeaker": "PrioritySpeaker",
+			"priority": "PrioritySpeaker",
+	
+	
+		
+		/* :: WEBHOOKS :: */
+		
+			"manageWebhooks": "ManageWebhooks",
+			
+			
+		/* :: Slash Commands :: */
+		
+			"useApplicationCommands": "UseApplicationCommands",
+			"useSlashCommands": "UseApplicationCommands",
+			"useCommands": "UseApplicationCommands",
+			"applicationCommands": "UseApplicationCommands",
+			"slashCommands": "UseApplicationCommands",
+			"commands": "UseApplicationCommands",
+		
+		
+		
+		/* :: EVENTS :: */
+		
+			"manageEvents": "ManageEvents",
+			"events": "ManageEvents",
+		
+		
+		
+		/* :: THREADS :: */
+		
+			// manage threads
+			"manageThreads": "ManageThreads",
+			"threads": "ManageThreads",
+		
+			// create public threads
+			"createPublicThreads": "CreatePublicThreads",
+			"publicThreads": "CreatePublicThreads",
+		
+			// create private threads
+			"createPrivateThreads": "CreatePrivateThreads",
+			"privateThreads": "CreatePrivateThreads",
+			
+			// send messages in threads
+			"sendMessagesInThreads": "SendMessagesInThreads",
+			"sendThreadMessages": "SendMessagesInThreads",
+			"threadMessages": "SendMessagesInThreads",
+			"messageInThreads": "SendMessagesInThreads",
+			
+			
+			
+		/* :: ACTIVITIES :: */
+		
+			"useEmbeddedActivities": "UseEmbeddedActivities",
+			"useActivities": "UseEmbeddedActivities",
+			"embeddedActivities": "UseEmbeddedActivities",
+			"activities": "UseEmbeddedActivities"
+			
+			
+		
+		/* :: STAGE :: */
+		
+			"requestToSpeak": "RequestToSpeak",
+	
 	};
 	
 	
@@ -2026,4 +2189,4 @@ class Button {
 }
 
 
-module.exports = { WillClient, Embed, ActionRow, Row, Button, Selection, SelectMenu, Stew, Soup };
+module.exports = { WillClient, Embed, ActionRow, Row, Button, Selection, SelectMenu, Stew, Soup, Noodle, random };
