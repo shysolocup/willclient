@@ -4,22 +4,22 @@
 	<br />
 	<img src="https://github.com/nuttmegg/psc/blob/main/assets/logo_white.png">
 	<br />
-	<a href="https://www.npmjs.com/package/psc"><img src="https://img.shields.io/npm/v/psc?style=flat&color=red&logo=npm&logoColor=white" alt="version" />
-	<a href="https://www.npmjs.com/package/psc"><img src="https://img.shields.io/npm/dt/psc?style=flat&color=green&logo=docusign&logoColor=white" alt="downloads" />
+	<a href="https://www.npmjs.com/package/will-client"><img src="https://img.shields.io/npm/v/will-client?style=flat&color=red&logo=npm&logoColor=white" alt="version" />
+	<a href="https://www.npmjs.com/package/will-client"><img src="https://img.shields.io/npm/dt/will-client?style=flat&color=green&logo=docusign&logoColor=white" alt="downloads" />
 	<a href="https://nodejs.org/en/"><img src="https://img.shields.io/node/v/discord.js?logo=node.js&logoColor=white" alt="node.js version" />
 	<a href="https://discord.js.org/"><img src="https://img.shields.io/badge/discord.js-v14.7.1-blue?style=flat&color=7289da&logo=discord&logoColor=white" alt="discord.js version" /></a>
-	<a href="https://github.com/nuttmegg/psc/discussions"><img src="https://img.shields.io/github/discussions/nuttmegg/psc?logo=google%20chat&logoColor=white" alt="discussions" />
-	<a href="https://github.com/nuttmegg/psc/issues"><img src="https://img.shields.io/github/issues/nuttmegg/psc" alt="issues" />
+	<a href="https://github.com/paigeroid/will-client/discussions"><img src="https://img.shields.io/github/discussions/paigeroid/will-client?logo=google%20chat&logoColor=white" alt="discussions" />
+	<a href="https://github.com/paigeroid/will-client/issues"><img src="https://img.shields.io/github/issues/paigeroid/will-client" alt="issues" />
 	
 
-PSC is a combination of [Discord.JS](https://discord.js.org/) and [Discord.PY](https://github.com/Rapptz/discord.py) made in [Node.JS](https://nodejs.org/en/) to solve most of the annoying parts of Discord.JS and possibly welcome users into Node.JS
+Will Client (WC) is a combination of [Discord.JS](https://discord.js.org/) and [Discord.PY](https://github.com/Rapptz/discord.py) made in [Node.JS](https://nodejs.org/en/) to solve most of the annoying parts of Discord.JS and possibly welcome users into Node.JS
 
 <br>
 
 *__THIS IS A VERY EARLY VERSION AND I WILL UPDATE IT OVER TIME__*<br><br>
 
-for a look at some examples check out the [examples folder](https://github.com/nuttmegg/psc/tree/main/examples)<br>
-for a full look at everything go check out the [wiki pages](https://github.com/nuttmegg/psc/wiki)
+for a look at some examples check out the [examples folder](https://github.com/paigeroid/will-client/tree/main/examples)<br>
+for a full look at everything go check out the [wiki pages](https://github.com/paigeroid/will-client/wiki)
 
 </div>
 
@@ -30,10 +30,10 @@ for a full look at everything go check out the [wiki pages](https://github.com/n
 <br>
 		
 ## Usage
-PSC simplifies prefix commands and is heavily inspried by the design and functionality of Discord.PY while still being made with Discord.JS
+WC simplifies prefix commands and is heavily inspried by the design and functionality of Discord.PY while still being made with Discord.JS
 ```js
-// psc
-psc.command( "ping", async (ctx) => {
+// wc
+wc.command( "ping", async (ctx) => {
 	await ctx.reply("Pong!");		
 });
 ```
@@ -46,22 +46,22 @@ async def ping(ctx):
 It also has aliases for commands
 ```js
 // works with avatar or av
-psc.command( {name: "avatar", aliases: ["av"]}, (ctx) => {
-	ctx.reply(psc.author.avatar());	
+wc.command( {name: "avatar", aliases: ["av"]}, (ctx) => {
+	ctx.reply(wc.author.avatar());	
 });
 ```
 It has built in arguments or parameters whatever you prefer to call them that you can use
 ```js
 // tagify <@id> or id
-psc.command( "tagify", (ctx, cmd) => {
-	let user = await psc.fetchUser(cmd.args[0]);
+wc.command( "tagify", (ctx, cmd) => {
+	let user = await wc.fetchUser(cmd.args[0]);
 	
 	ctx.reply(user.tag);
 });
 ```
 And built in cooldowns
 ```js
-psc.command( {name: "ping", cooldown: "30s"}, (ctx, cmd) => {
+wc.command( {name: "ping", cooldown: "30s"}, (ctx, cmd) => {
 	if (cmd.onCooldown) return psc.reply("Command is on cooldown!", {deleteAfter: "3s"});
 	
 	ctx.reply("Pong!");
@@ -72,37 +72,37 @@ psc.command( {name: "ping", cooldown: "30s"}, (ctx, cmd) => {
 
 ## Installation
 ```console
-npm i psc
+npm i will-client
 ```
 ```console
-npm i nuttmegg/psc
+npm i paigeroid/will-client
 ```
 
 <br>
 
 ## Setting Up
 ### **Discord.JS Client**
-PSC is built off of Discord.JS so for it to work you need Discord.JS.
+WC is built off of Discord.JS so for it to work you need Discord.JS.
 ```js
 const { Client } = require('discord.js');
 const client = new Client({
 	// your stuff here
 });
 ```
-### **PSC Client**
-once you have your Discord.JS client you can add in PSC/
+### **WC Client**
+once you have your Discord.JS client you can add in WC
 ```js
-const { PSClient } = require('psc');
-const psc = new PSClient({
+const { WillClient } = require('will-client');
+const wc = new WillClient({
 	client: client,
 	prefix: "!" 
 });
 ```
-once you have your PS client set up and working you can run it using either of these:
+once you have your client set up and working you can run it using either of these:
 ```js
 client.login(token); // normal discord.js
 
-psc.run(token); // optional alternative
+wc.run(token); // optional alternative
 ```
 <br>
 
