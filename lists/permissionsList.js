@@ -1,4 +1,4 @@
-permissionList = {
+let permissionList = {
 
 
 	/* :: ADMINISTRATOR :: */
