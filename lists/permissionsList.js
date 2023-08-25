@@ -252,7 +252,7 @@ let permissionList = {
 	"useEmbeddedActivities": "UseEmbeddedActivities",
 	"useActivities": "UseEmbeddedActivities",
 	"embeddedActivities": "UseEmbeddedActivities",
-	"activities": "UseEmbeddedActivities"
+	"activities": "UseEmbeddedActivities",
 	
 	
 
