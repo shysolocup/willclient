@@ -13,7 +13,7 @@ wc.event("ready", (ctx) => {
 
 wc.command( {name: "ping", cooldown: 5}, async (ctx, cmd) => {
     if (cmd.onCooldown) {
-        return ctx.reply(`Command is on cooldown for ${cmd.cooldown.time} seconds!`);
+        return ctx.reply(`You can use this command again in ${cmd.cooldown.relative}`);
     }
     
     ctx.reply("Ping! Command is not on cooldown!");
