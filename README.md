@@ -10,6 +10,7 @@
 	<a href="https://github.com/paigeroid/willclient/discussions"><img src="https://img.shields.io/github/discussions/paigeroid/willclient?logo=google%20chat&logoColor=white" alt="discussions" />
 	<a href="https://github.com/paigeroid/willclient/issues"><img src="https://img.shields.io/github/issues/paigeroid/willclient" alt="issues" />
  	<a href="https://npmjs.com/package/stews"><img src="https://custom-icon-badges.demolab.com/badge/Stews-v1.7.1-orange.svg?logo=stew&logoColor=white" alt="stews"></a>
+  	<img src="https://github.com/paigeroid/willclient/actions/workflows/publish-shit.yml/badge.svg" alt="stews">
 	
 
 WillClient (WC) is a custom Discord API mod that combines elements from [Discord.JS](https://discord.js.org/) and [Discord.PY](https://github.com/Rapptz/discord.py) made in [Node.JS](https://nodejs.org/en/) to solve most of the annoying parts of Discord.JS and possibly welcome users into Node.JS
