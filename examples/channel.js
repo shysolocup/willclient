@@ -22,7 +22,7 @@ wc.command( {name: "purge"}, async (ctx, cmd) => {
 });
 
 wc.command( {name: "lock", aliases: ["lockdown"]}, async (ctx, cmd) => {
-    let channel = (cmd.args.length > 0) ? wc.fetchChannel(cmd.args[0]) : ctx.channel;
+    let channel = (cmd.args.length > 0) ? await wc.fetchChannel(cmd.args[0]) : ctx.channel;
     
     if (wc.author.hasPermissions(["manageChannels"]) {
         wc.channel.lock(channel);
@@ -32,7 +32,7 @@ wc.command( {name: "lock", aliases: ["lockdown"]}, async (ctx, cmd) => {
 });
 
 wc.command( {name: "unlock", aliases: ["unlockdown"]}, async (ctx, cmd) => {
-    let channel = (cmd.args.length > 0) ? wc.fetchChannel(cmd.args[0]) : ctx.channel;
+    let channel = (cmd.args.length > 0) ? await wc.fetchChannel(cmd.args[0]) : ctx.channel;
     
     if (wc.author.hasPermissions(["manageChannels"]) {
         wc.channel.unlock(channel);
