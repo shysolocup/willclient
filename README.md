@@ -6,8 +6,7 @@
 	<br />
 	<a href="https://www.npmjs.com/package/willclient"><img src="https://img.shields.io/npm/v/willclient?style=flat&color=red&logo=npm&logoColor=white" alt="version" />
 	<a href="https://www.npmjs.com/package/willclient"><img src="https://img.shields.io/npm/dt/willclient?style=flat&color=green&logo=docusign&logoColor=white" alt="downloads" />
-	<a href="https://nodejs.org/en/"><img src="https://img.shields.io/node/v/discord.js?logo=node.js&logoColor=white" alt="node.js version" />
-	<a href="https://discord.js.org/"><img src="https://img.shields.io/badge/discord.js-v14.7.1-blue?style=flat&color=7289da&logo=discord&logoColor=white" alt="discord.js version" /></a>
+	<a href="https://discord.js.org/"><img src="https://img.shields.io/badge/discord.js-v14.13.0-blue?style=flat&color=7289da&logo=discord&logoColor=white" alt="discord.js version" /></a>
 	<a href="https://github.com/paigeroid/willclient/discussions"><img src="https://img.shields.io/github/discussions/paigeroid/willclient?logo=google%20chat&logoColor=white" alt="discussions" />
 	<a href="https://github.com/paigeroid/willclient/issues"><img src="https://img.shields.io/github/issues/paigeroid/willclient" alt="issues" />
  	<a href="https://npmjs.com/package/stews"><img src="https://custom-icon-badges.demolab.com/badge/Stews-v1.7.1-orange.svg?logo=stew&logoColor=white" alt="stews"></a>
