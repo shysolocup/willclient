@@ -31,7 +31,7 @@ wc.command( {name: "buttons"}, async (ctx, cmd) => {
 
 /* button event */
 
-wc.buttonAction(async (ctx) => {
+wc.buttonAction( async (ctx) => {
     let id = ctx.customId;
         
     if (id == "true") {
