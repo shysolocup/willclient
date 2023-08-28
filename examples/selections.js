@@ -12,7 +12,7 @@ wc.event("ready", (ctx) => {
 /* commands */
 
 wc.command( {name: "selections"}, async (ctx, cmd) => {
-    let select = wc.Selection({
+    let select = new wc.Selection({
         id: "question",
         placeholder: "Choose wisely..",
         min: 1,
@@ -25,7 +25,7 @@ wc.command( {name: "selections"}, async (ctx, cmd) => {
         ]
     });
     
-    let row = wc.ActionRow([select]);
+    let row = new wc.ActionRow([select]);
     
     ctx.reply({components: [row]});
 });
