@@ -11,7 +11,7 @@ wc.event("ready", (ctx) => {
 
 /* commands */
 
-wc.command( {name: "ping", cooldown: 5}, async (ctx, cmd) => {
+wc.command( {name: "ping", cooldown: "5s"}, async (ctx, cmd) => {
     if (cmd.onCooldown) {
         return ctx.reply(`You can use this command again in ${cmd.cooldown.relative}`);
     }
