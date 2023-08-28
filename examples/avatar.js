@@ -11,11 +11,11 @@ wc.event("ready", (ctx) => {
 
 /* commands */
 
-wc.command( {name: "avatar", aliases: ["av"], cooldown: 5}, (ctx, cmd) => {
+wc.command( {name: "avatar", aliases: ["av"], cooldown: 5}, async (ctx, cmd) => {
     if (cmd.onCooldown) return wc.reply("Command is on cooldown!", {deleteAfter: 3});
     
     if (cmd.args[0]) {
-        let user = wc.fetchUser(cmd.args[0]);
+        let user = await wc.fetchUser(cmd.args[0]);
         return ctx.reply(wc.user.avatar(user));
     }
     else {
