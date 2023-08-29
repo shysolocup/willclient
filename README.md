@@ -96,7 +96,8 @@ once you have your Discord.JS client you can add in WC
 const { WillClient } = require('willclient');
 const wc = new WillClient({
 	client: client,
-	prefix: "!" 
+	prefix: "!",
+	token: token
 });
 ```
 once you have your client set up and working you can run it using either of these:
