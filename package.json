@@ -6,6 +6,7 @@
     "dependencies": {
         "discord.js": "latest",
         "@discordjs/voice": "latest",
+        "node-fetch": "latest",
         "stews": "latest"
     },
     "repository": {
