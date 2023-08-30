@@ -1,6 +1,6 @@
 let eventList = {
-
 	
+
 // run bot
 "start": "ready",
 "run": "ready",
@@ -128,6 +128,10 @@ let eventList = {
 	"commandEdit": "applicationCommandUpdate",
 	"editCommand": "applicationCommandUpdate",
 
+	// run slash command 
+	"commandRan": "interactionCreate",
+	"command": "interactionCreate",
+
 
 
 /* :: CHANNELS :: */
@@ -167,6 +171,7 @@ let eventList = {
 	
 	
 /* :: ROLES :: */
+
 	// create role
 	"createRole": "roleCreate",
 	"newRole": "roleCreate",
@@ -199,6 +204,7 @@ let eventList = {
 	
 	
 /* :: STICKERS :: */
+
 	// create sticker
 	"newSticker": "stickerCreate",
 	"createSticker": "stickerCreate",
@@ -254,6 +260,12 @@ let eventList = {
 	"selectSubmit": "interactionCreate",
 	"selectMenuSubmit": "interactionCreate",
 	"selectionSubmit": "interactionCreate",
+
+
+
+/* :: COOLDOWNS :: */
+
+	"cooldown": "onCooldown",
 	
 	
 	
@@ -396,7 +408,7 @@ let eventList = {
 	
 	// invalidated
 	"invalidated": "invalidated",
-
-}
+	
+};
 
 module.exports = { eventList }
