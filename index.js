@@ -694,13 +694,13 @@ class WillClient {
 	slashCMDExists(name) { return this.slashCommandExists(name); }
 
 
-
 	async slashCommandHandler(ctx) {
 		if (!ctx.isChatInputCommand()) return;
 
 		if (this.slashCommandExists(ctx.commandName)) {
 			let cmd = Soup.from(this.fetchSlashCommand(ctx.commandName)).copy().pour()
-			cmd.args = ctx.options.data
+			cmd.args = ctx.options.data;
+			ctx.author = ctx.user;
 
 			await this.executeSlashCommand(ctx.commandName, ctx, cmd)
 		}
