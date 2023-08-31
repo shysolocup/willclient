@@ -1,5 +1,5 @@
 /*
-	:: WillClient :: Version 0.6.0 | 08/25/23 ::
+	:: WillClient :: Version 1.0.0 | 08/30/23 ::
 	https://github.com/paigeroid/willclient
 
 */
@@ -10,16 +10,20 @@
 */
 
 
-const { ActivityType } = require('discord.js');
+// Imports
+const { ActivityType, REST, Routes } = require('discord.js');
 const voice = require('@discordjs/voice');
 const { Stew, Soup, Noodle, random } = require('stews');
 var fs = require('fs');
+
+import('node-fetch');
 
 
 // String Functions
 String.prototype.colorFormat = function() {
 	if (this.startsWith("#")) { var a = this.replace("#", "0x"); return parseInt(a); } else { return 0x5865F2; }
 };
+
 String.prototype.codeBlock = function(language=null) {
 	return (language) ? `\`\`\`${language}\n${this}\`\`\`` : `\`\`\`${this}\`\`\``;
 };
@@ -42,12 +46,77 @@ var Holder;
 class WillClient {
     constructor(settings) {
     	this.client = settings.client;
-    	this.prefix = settings.prefix
-    	
-    	if (this.client) {
-    		ClientHandler(this, this.client);
-			this.handlerActive = true
-    	}
+    	this.prefix = settings.prefix;
+
+		console.log("willclient started");
+
+		
+		// prefix commands
+		this.client.on("messageCreate", async (ctx) => {
+			Holder = [this, this.client, ctx];
+			await this.commandHandler(ctx);
+		});
+	
+		
+		// slash commands
+		this.client.on("interactionCreate", async (ctx) => {
+			if (ctx.isChatInputCommand()) {
+				Holder = [this, this.client, ctx];
+				await this.slashCommandHandler(ctx);
+			}
+		});
+
+
+		// applying slash commands
+		this.client.on("ready", async (ctx) => {
+
+			if (!settings.token && this.slashCommandList.length <= 0) {
+				throw new CoolError("Slash Command Registering", "You must include your bot's token in the settings object for slash commands to register properly\n\nEx: { client: client, prefix: prefix, token: token }");
+			}
+
+
+			var jsonCommands = this.slashCommandList.values.map( (command) => {
+				let info = command.info.copy()
+				
+				// removing cooldown because it breaks it because it's stupid
+				if (info.has("cooldown")) info.delete("cooldown");
+	
+				return info.toJSON()
+				
+			});
+	
+			this.rest = new REST().setToken(settings.token)
+			fetch('https://discordapp.com/api/oauth2/applications/@me', {
+				headers: {
+					authorization: `Bot ${settings.token}`,
+				},
+			})
+	
+				.then(result => result.json())
+				.then( async (response) => {
+					const { id } = response;
+					
+					await this.rest.put(
+						Routes.applicationCommands(id),
+						{ body: jsonCommands }
+					);
+			})
+			.catch(console.error);
+		});
+
+		
+		// Function Maker
+		Object.defineProperties(this, {
+    		"Function": { value: WCFunctionMaker }, "function": { value: WCFunctionMaker },
+    		"Func": { value: WCFunctionMaker }, "func": { value: WCFunctionMaker}
+		});
+
+
+		// Property Maker
+		Object.defineProperties(this, {
+    		"Property": { value: WCPropertyMaker }, "property": { value: WCPropertyMaker },
+    		"Prop": { value: WCPropertyMaker }, "prop": { value: WCPropertyMaker }
+		});
     }
 	
     /* configurations */
@@ -56,29 +125,47 @@ class WillClient {
     }
 
 
+	setToken(token) {
+		this.token = token;
+		this.rest = new REST().setToken(this.token)
+	}
+
+
 	build(path, ignore=["index.js"], action=(path, file) => { require(`../../${path}/${file}`); }) {
 		let files = fs.readdirSync(`${path}`).filter(file => (file.endsWith('.js') && !ignore.includes(file) ));
 		files.forEach( (file) => { action(path, file) } );
 	}
 
 
-	compile(path, ignore=["index.js"], action=(path, file, compiled, name) => { compiled.push(name, require(`../../${path}/${file}`)); }, json=true) {
+	compile(call, path, ignore=["index.js"], action=(path, file, compiled, name) => { compiled.push(name, require(`../../${path}/${file}`)); }, json=true) {
 		let files = fs.readdirSync(`${path}`).filter(file => ((file.endsWith('.js') || (json && file.endsWith(".json"))) && !ignore.includes(file) ));
 		let stuff = new Soup(Object);
 		
 		files.forEach( (file) => {
-			let name = (file.endsWith(".js")) ? file.split(".js")[0] : (file.endsWith(".json")) ? file.split(".json")[0] : file;
-			action(path, file, stuff, name);
+			action(path, file, stuff, call);
 		});
 
 		return stuff;
+	}
+
+
+	addon(call, path, ignore=[], action=(path) => { return require(`../../${path}`); }) {
+		this[call] = action(path)
 	}
     
     
     
     /* variables */
     commandList = new Stew(Object);
+	slashCommandList = new Stew(Object);
+	cooldownHandles = new Soup(Array);
 	handlerActive = false;
+
+
+	get ctx() {
+		var [wc, client, ctx] = Holder;
+		return ctx
+	}
 	
 	
 	globalCooldown = {
@@ -89,7 +176,7 @@ class WillClient {
     	handle: function(user=null) {
 			var [wc, client, ctx] = Holder;
 
-			user = (user) ? user : ctx.author;
+			user = (user) ? user : (ctx.author) ? ctx.author : ctx.user;
 					
         	if (!this.data.has(user.id)) {
             	this.data.add(user.id);
@@ -101,7 +188,10 @@ class WillClient {
     	
     	fetch: function(user=null) {
 			var [wc, client, ctx] = Holder;
-			return (this.data.has( (user) ? user.id : ctx.author.id )) ? true : false;
+
+			user = (user) ? user : (ctx.author) ? ctx.author : ctx.user;
+
+			return (this.data.has(user.id)) ? true : false;
     	}
 	};
 	
@@ -146,9 +236,6 @@ class WillClient {
     
     /* commands */
     command(info={name:null, aliases:null, cooldown:null}, data) {
-		if (!this.handlerActive) { this.handlerActive = true; ClientHandler(this, this.client); }
-
-
 		if (typeof info == "string") {
 			let thing = info;
 			info = { name: thing, aliases: null, cooldown: null};
@@ -244,6 +331,8 @@ class WillClient {
 		
 		return exists;
 	}
+
+	CMDExists(name, func) { return this.CommandExists(name); }
     
     
     fetchCommand(name, func=null) {
@@ -276,15 +365,14 @@ class WillClient {
         return (!func) ? returns : func(returns);
     }
     
-    
     fetchCMD(name, func=null) { return this.fetchCommand(name,func); }
     
     
-    executeCommand(name, ctx, cmd) {
+    async executeCommand(name, ctx, cmd) {
 		var onCooldown; var cooldown; var cooldownType
     	var command = this.fetchCommand(name);
-    	
-    	
+
+		
     	if (command.cooldown && command.cooldown.active) {
 			if (command.cooldown.fetch()) {
 				cooldown = command.cooldown;
@@ -316,12 +404,19 @@ class WillClient {
     	cmd.onCooldown = (onCooldown) ? onCooldown : false;
 		cmd.cooldownType = (cooldownType) ? cooldownType : null;
 		cmd.cooldown = (cooldown) ? cooldown : {};
+
+
+		if (cmd.onCooldown) {
+			this.cooldownHandles.forEach( (handle) => {
+				handle(ctx, cmd)
+			});
+		}
     	
     	
-    	return command.data(ctx, cmd);
+    	return await command.data(ctx, cmd);
     }
     
-    executeCMD(name, ctx, cmd=null) { return this.executeCommand(name, ctx, cmd); }
+    executeCMD(name, ctx, cmd) { return this.executeCommand(name, ctx, cmd); }
 
 
 	commandFormat(string, prefix) {
@@ -348,7 +443,7 @@ class WillClient {
 	}
 
 
-	commandHandler(ctx) {
+	async commandHandler(ctx) {
 		if (ctx.author.bot || ctx.author.id == this.client.user.id) return;
 		
 		let prefix = (this.prefix instanceof Object && this.prefix[ctx.guild.id] ) ? this.prefix[ctx.guild.id] : (this.prefix instanceof Object) ? this.prefix.default : this.prefix;
@@ -358,7 +453,255 @@ class WillClient {
 		let cmd = this.commandFormat(ctx.content, prefix);
 		
 		if (this.commandExists(cmd.name)) {
-			this.executeCommand(cmd.name, ctx, cmd);
+			await this.executeCommand(cmd.name, ctx, cmd);
+		}
+	}
+
+	
+	slashCommand(info={name:null, description:null, options:null, cooldown:null, nsfw:false}, dataA, dataB=null) {
+		if (typeof info == "string") {
+			let thing = info;
+			info = { name: thing, description:null, options:null, cooldown:null, nsfw:false };
+		}
+
+		if (info.options && info.options instanceof Array) {
+			var options = Soup.from(info.options)
+
+			options = options.map( (v) => {
+				v.type = this.optionType(v.type);
+				if (v.desc && !v.description) v.description = v.desc;
+				return v;
+			})
+		}
+
+		if (info.desc && !info.description) info.description = info.desc
+
+		var data
+		if (typeof dataA == "string" && !info.description) {
+			info.description = dataA
+			data = dataB
+		}
+		else if (info.description) {
+			data = dataA
+		}
+ 		
+		
+		var [name, description] = [info.name, info.description];
+		
+		
+		if (info.cooldown && typeof info.cooldown == "number") { var time = info.cooldown; }
+		else if (info.cooldown && typeof info.cooldown == "string") { var time = this.time.parse(info.cooldown); }
+		else if (info.cooldown) { throw new CoolError("Slash Command Creation", 'Invalid cooldown. ( cooldown: 3 | cooldown: "3s" )'); }
+		
+		
+		if (!name || typeof name != "string" || name.length <= 0) {
+			throw new CoolError("Slash Command Creation", "Invalid slash command name.\n\nPossible reasons:\n    • doesn't exist\n    • not a string\n    • blank string\n\nActual error stuff:");
+		}
+
+		if (!description || typeof description != "string" || description.length <= 0) {
+			throw new CoolError("Slash Command Creation", "Invalid slash command description.\n\nPossible reasons:\n    • not a string\n    • blank string\n\nActual error stuff:");
+		}
+		
+		
+		if (info.cooldown) {
+			if (typeof time != "number") {
+				throw new CoolError("Slash Command Creation", "Cooldown has to be an integer (seconds)");
+			}
+			
+			
+			info.cooldown = {
+				data: new Set(),
+				active: true,
+				time: time,
+				
+				get relative() {
+					var [wc, client, ctx] = Holder;
+					let now = parseInt(wc.time.now.relative.split(":")[1]);
+					let raw = Math.abs( info.cooldown.time + parseInt(now) );
+					return `<t:${raw}:R>`;
+				},
+				
+				
+				get raw() {
+					var [wc, client, ctx] = Holder;
+					let now = parseInt(wc.time.now.relative.split(":")[1]);
+					return Math.abs( info.cooldown.time + parseInt(now) );
+				},
+				
+				
+				handle(user=null) {
+					var [wc, client, ctx] = Holder;
+	
+					user = (user) ? user : ctx.user;
+					
+					if (!this.data.has(user.id)) {
+						this.data.add(user.id);
+						
+						setTimeout( () => { this.data.delete(user.id); }, this.time*1000);
+					}
+				},
+				
+				
+				fetch(user=null) {
+					var [wc, client, ctx] = Holder;
+					return (this.data.has( (user) ? user.id : ctx.user.id )) ? true : false;
+				}
+			};
+		}
+		
+		let newCMD = {"info": Soup.from(info), "data": data};
+		this.slashCommandList.push(info.name, newCMD);
+
+		return newCMD;
+	}
+
+
+	optionType(type) {
+		return (typeof type == "number")
+			? type
+		: ( ["sub_command", "sub_com", "sub"].includes(type.toLowerCase()) )
+			? 1
+		: ( ["sub_command_group", "sub_com_group", "sub_group"].includes(type.toLowerCase()) )
+			? 2
+		: ( ["string", "str"].includes(type.toLowerCase()) )
+			? 3
+		: ( ["integer", "int"].includes(type.toLowerCase()) )
+			? 4
+		: ( ["boolean", "bool"].includes(type.toLowerCase()) )
+			? 5
+		: ( ["user", "member"].includes(type.toLowerCase()) )
+			? 6
+		: (type.toLowerCase() == "channel")
+			? 7
+		: (type.toLowerCase() == "role")
+			? 8
+		: ( ["mentionable", "mention"].includes(type.toLowerCase())  )
+			? 9
+		: ( ["number", "num"].includes(type.toLowerCase()) )
+			? 10
+		: ( ["attachment", "file"].includes(type.toLowerCase()) )
+			? 5
+		: null;
+	}
+
+
+	async executeSlashCommand(name, ctx, cmd) {
+		var onCooldown; var cooldown; var cooldownType
+    	var command = this.slashCommandList.get(name);
+    	
+    	
+    	if (command.info.cooldown && command.info.cooldown.active) {
+			if (command.info.cooldown.fetch()) {
+				cooldown = command.info.cooldown;
+				cooldownType = "commandCooldown";
+				onCooldown = true;
+			}
+			
+			command.info.cooldown.handle();
+    	}
+    	
+    	else if (this.globalCooldown && this.globalCooldown.active) {
+			if (this.globalCooldown.fetch()) {
+				cooldown = this.globalCooldown;
+				cooldownType = "globalCooldown";
+				onCooldown = true;
+			}
+			
+			this.globalCooldown.handle();
+    	}
+    	
+		else {
+			
+			cooldown = {};
+			onCooldown = false;
+			cooldownType = null;
+			
+		}
+    	
+    	cmd.onCooldown = (onCooldown) ? onCooldown : false;
+		cmd.cooldownType = (cooldownType) ? cooldownType : null;
+		cmd.cooldown = (cooldown) ? cooldown : {};
+    	
+
+		if (cmd.onCooldown) {
+			this.cooldownHandles.forEach( (handle) => {
+				handle(ctx, cmd)
+			});
+		}
+
+    	
+    	return await command.data(ctx, cmd);
+    }
+    
+    async executeSlashCMD(name, ctx, cmd) { return this.executeSlashCommand(name, ctx, cmd); }
+
+
+	fetchSlashCommand(name, func=null) {
+        var index;
+        
+        try {
+        	for (let i = 0; i < this.slashCommandList.length+1; i++) {
+        	    var info = this.slashCommandList.get(i).info;
+        		if (info.get("name") == name ) { throw i; }
+        	}
+        	throw null;
+        	
+        } catch(has) {
+            if (has == null) throw new CoolError("Slash Command Fetch Error", "Invalid slash command name.");
+            else index = has;
+        }
+        
+        
+        let command = this.slashCommandList.get(index);
+		
+		let returns = {
+			
+			name: command.info.get("name"),
+			description: command.info.get("description"),
+			cooldown: command.info.get("cooldown"),
+			options: command.info.get("options"),
+			nsfw: command.info.get("nsfw"),
+			data: command.data
+		
+		};
+        
+        return (!func) ? returns : func(returns);
+    }
+
+    fetchSlashCMD(name, func=null) { return this.fetchSlashCommand(name,func); }
+
+
+	slashCommandExists(name) {
+		var exists;
+		
+		try {
+			
+        	for (let i = 0; i < this.slashCommandList.length; i++) {
+        	    let info = this.slashCommandList.get(i).info;
+        		if (info.get("name") == name) { throw true; }
+        	}
+        	
+        	throw false;
+        	
+        } catch(has) {
+            exists = has;
+        }
+		
+		return exists;
+	}
+
+	slashCMDExists(name) { return this.slashCommandExists(name); }
+
+
+
+	async slashCommandHandler(ctx) {
+		if (!ctx.isChatInputCommand()) return;
+
+		if (this.slashCommandExists(ctx.commandName)) {
+			let cmd = Soup.from(this.fetchSlashCommand(ctx.commandName)).copy().pour()
+			cmd.args = ctx.options.data
+
+			await this.executeSlashCommand(ctx.commandName, ctx, cmd)
 		}
 	}
     
@@ -493,6 +836,10 @@ class WillClient {
 			"updateCommand": "applicationCommandUpdate",
 			"commandEdit": "applicationCommandUpdate",
 			"editCommand": "applicationCommandUpdate",
+
+			// run slash command 
+			"commandRan": "interactionCreate",
+			"command": "interactionCreate",
 		
 		
 		
@@ -533,6 +880,7 @@ class WillClient {
 			
 			
 		/* :: ROLES :: */
+		
 			// create role
 			"createRole": "roleCreate",
 			"newRole": "roleCreate",
@@ -565,6 +913,7 @@ class WillClient {
 			
 			
 		/* :: STICKERS :: */
+		
 			// create sticker
 			"newSticker": "stickerCreate",
 			"createSticker": "stickerCreate",
@@ -620,6 +969,12 @@ class WillClient {
 			"selectSubmit": "interactionCreate",
 			"selectMenuSubmit": "interactionCreate",
 			"selectionSubmit": "interactionCreate",
+
+
+		
+		/* :: COOLDOWNS :: */
+
+			"cooldown": "onCooldown",
 			
 			
 			
@@ -773,14 +1128,21 @@ class WillClient {
 			? name
 		: function() { throw new CoolError("Event Error", "Invalid event name.") }();
 		
-		let noodName = Noodle.new(name);
+		let noodName = new Noodle(name);
+
+		if (eventName == "onCooldown") {
+			return this.cooldownHandles.push(func)
+		}
 		
 		this.client.on(eventName, (ctx) => {
 			if (eventName == "interactionCreate") {
 				if (ctx.isButton() && noodName.equalTo("button", "buttonPress", "buttonPressed") ) {
 					return func(ctx);
 				}
-				if (ctx.isSelectMenu() && noodName.equalTo("selection", "select", "selectMenu", "submitSelection", "submitSelectMenu", "selectSubmit", "selectMenuSubmit", "selectionSubmit") ) {
+				if (ctx.isStringSelectMenu() && noodName.equalTo("selection", "select", "selectMenu", "submitSelection", "submitSelectMenu", "selectSubmit", "selectMenuSubmit", "selectionSubmit") ) {
+					return func(ctx);
+				}
+				if (ctx.isChatInputCommand() && noodName.equalTo("commandRan", "command") ) {
 					return func(ctx);
 				}
 			}
@@ -789,6 +1151,15 @@ class WillClient {
     }
 	on(name, func) { return this.event(name, func); }
 	action(name, func) { return this.event(name, func); }
+
+
+	commandAction(func) {
+		this.client.on("interactionCreate", (ctx) => {
+			if (ctx.isChatInputCommand()) {
+				return func(ctx);
+			}
+		});
+	}
 	
 	
 	buttonAction(func) {
@@ -1013,7 +1384,7 @@ class WillClient {
 	
 	
 	
-	parseEmoji(emoji) {
+	parseEmoji(emoji, fileType=null) {
 		if (!emoji) return null;
 		var emojiInfo = {};
 
@@ -1032,7 +1403,10 @@ class WillClient {
 			}
 
 			emojiInfo.animated = animated
-			emojiInfo.url = `https://cdn.discordapp.com/emojis/${emojiInfo.id}.${ (animated) ? "gif" : "png" }`;
+			emojiInfo.url = `https://cdn.discordapp.com/emojis/${emojiInfo.id}.${ 
+                (fileType) ? fileType : 
+                ((animated) ? "gif" : "png")
+            }`;
 
 			return emojiInfo;
 		}
@@ -1882,10 +2256,9 @@ class WillClient {
 		avatar(user=null, dynamic=false) {
 			var [wc, client, ctx] = Holder;
 			if (!user) {
-				return ctx.author.displayAvatarURL(dynamic);
-			} else {
-				return user.displayAvatarURL(dynamic);
+				user = (ctx.author) ? ctx.author : ctx.user;
 			}
+			return user.displayAvatarURL(dynamic);
 		}
 		avatarUrl(user=null, dynamic=false) { return this.avatar(user, dynamic); }
 		avatarURL(user=null, dynamic=false) { return this.avatar(user, dynamic); }
@@ -1907,10 +2280,9 @@ class WillClient {
 			cache(user=null) {
 				var [wc, client, ctx] = Holder;
 				if (!user) {
-					return ctx.member.roles.cache;
-				} else {
-					return user.roles.cache;
+					user = (ctx.author) ? ctx.author : ctx.user;
 				}
+				return user.roles.cache;
 			}
 			
 			list(user=null) {
@@ -2060,16 +2432,6 @@ class WillClient {
 }
 
 
-function ClientHandler(wc, client) {
-	console.log("willclient started");
-	
-	client.on("messageCreate", async (ctx) => {
-		Holder = [wc, client, ctx];
-		wc.commandHandler(ctx);
-	});
-}
-
-
 function FuckPromises(stupids, func, user=false) {
 	var [wc, client, ctx] = Holder;
 	var stupidList = [];
@@ -2171,6 +2533,7 @@ class ActionRow {
 		return { type: 1, components: array };
 	}
 }
+
 var Row = ActionRow;
 
 
@@ -2190,4 +2553,48 @@ class Button {
 }
 
 
-module.exports = { WillClient, Embed, ActionRow, Row, Button, Selection, SelectMenu, Stew, Soup, Noodle, random };
+// Function Maker
+class WCFunctionMaker {
+    constructor(name, func) {
+        var stuff = (func instanceof Function) ? func : function() { return func; }
+
+        Object.defineProperty(stuff, "name", { value: name });
+        Object.defineProperty( WillClient.prototype, name, { value: stuff });
+
+        return stuff;
+    }
+}
+
+
+Object.defineProperties(WillClient, {
+    "Function": { value: WCFunctionMaker }, "function": { value: WCFunctionMaker },
+    "Func": { value: WCFunctionMaker }, "func": { value: WCFunctionMaker}
+});
+
+
+// Property Maker
+class WCPropertyMaker {
+    constructor(name, value, attributes={set:undefined, enumerable:false, configurable:false}) {
+        var func = (value instanceof Function) ? value : function() { return value; };
+        
+        Object.defineProperty(func, "name", { value: name });
+
+        Object.defineProperty(WillClient.prototype, name, {
+            get: func,
+            set: attributes.set,
+            enumerable: attributes.enumerable,
+            configurable: attributes.configurable
+        });
+
+        return func;
+    }
+}
+
+
+Object.defineProperties(WillClient, {
+    "Property": { value: WCPropertyMaker }, "property": { value: WCPropertyMaker },
+    "Prop": { value: WCPropertyMaker }, "prop": { value: WCPropertyMaker }
+});
+
+
+module.exports = { WillClient, Embed, ActionRow, Row, Button, Selection, SelectMenu, Stew, Soup, Noodle, random, WCFunctionMaker, WCPropertyMaker };
