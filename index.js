@@ -1,5 +1,5 @@
 /*
-	:: WillClient :: Version 1.0.0 | 08/30/23 ::
+	:: WillClient :: Version 1.0.0 | 08/31/23 ::
 	https://github.com/paigeroid/willclient
 
 */
@@ -150,7 +150,18 @@ class WillClient {
 	}
 
 
-	addon(call, path, ignore=[], action=(path) => { return require(`../../${path}`); }) {
+	addon(call, path, ignore=[], action=(path) => { 
+			try {
+				return require(`../../${path}`); 
+			} catch(e) {
+				try {
+					return require(path); 
+				} catch(e) {
+					throw new CoolError("Plugins", `Invalid plugin path: ${path}`);
+				}
+			}
+		}) {
+
 		this[call] = action(path)
 	}
     
