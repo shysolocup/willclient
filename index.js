@@ -137,12 +137,13 @@ class WillClient {
 	}
 
 
-	compile(call, path, ignore=["index.js"], action=(path, file, compiled, name) => { compiled.push(name, require(`../../${path}/${file}`)); }, json=true) {
+	compile(path, ignore=["index.js"], action=(path, file, compiled, name) => { compiled.push(name, require(`../../${path}/${file}`)); }, json=true) {
 		let files = fs.readdirSync(`${path}`).filter(file => ((file.endsWith('.js') || (json && file.endsWith(".json"))) && !ignore.includes(file) ));
 		let stuff = new Soup(Object);
 		
 		files.forEach( (file) => {
-			action(path, file, stuff, call);
+			let name = (file.endsWith(".js")) ? file.split(".js")[0] : (file.endsWith(".json")) ? file.split(".json")[0] : file;
+			action(path, file, stuff, name);
 		});
 
 		return stuff;
@@ -2578,7 +2579,6 @@ class WCPropertyMaker {
         var func = (value instanceof Function) ? value : function() { return value; };
         
         Object.defineProperty(func, "name", { value: name });
-
         Object.defineProperty(WillClient.prototype, name, {
             get: func,
             set: attributes.set,
