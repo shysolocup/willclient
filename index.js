@@ -53,7 +53,7 @@ class WillClient {
 		
 		// prefix commands
 		this.client.on("messageCreate", async (ctx) => {
-			Holder = [this, this.client, ctx];
+			Holder = [this, this.client, ctx, null];
 			await this.commandHandler(ctx);
 		});
 	
@@ -61,7 +61,7 @@ class WillClient {
 		// slash commands
 		this.client.on("interactionCreate", async (ctx) => {
 			if (ctx.isChatInputCommand()) {
-				Holder = [this, this.client, ctx];
+				Holder = [this, this.client, ctx, null];
 				await this.slashCommandHandler(ctx);
 			}
 		});
@@ -166,6 +166,12 @@ class WillClient {
 	get ctx() {
 		var [wc, client, ctx] = Holder;
 		return ctx
+	}
+
+
+	get cmd() {
+		var [wc, client, ctx, cmd] = Holder;
+		return cmd
 	}
 	
 	
@@ -412,6 +418,8 @@ class WillClient {
 				handle(ctx, cmd)
 			});
 		}
+
+		Holder[3] = cmd;
     	
     	
     	return await command.data(ctx, cmd);
@@ -629,6 +637,9 @@ class WillClient {
 				handle(ctx, cmd)
 			});
 		}
+
+
+		Holder[3] = cmd;
 
     	
     	return await command.data(ctx, cmd);
@@ -2433,6 +2444,7 @@ class WillClient {
 }
 
 
+
 function FuckPromises(stupids, func, user=false) {
 	var [wc, client, ctx] = Holder;
 	var stupidList = [];
@@ -2442,6 +2454,7 @@ function FuckPromises(stupids, func, user=false) {
 
 	return func(stupidList);
 }
+
 
 
 class Embed {
@@ -2508,9 +2521,8 @@ class Selection {
 	}
 }
 
-
-
 var SelectMenu = this.Selection;
+
 
 function buttonStyle(style) {
 	return (typeof style == "number")
@@ -2554,6 +2566,7 @@ class Button {
 }
 
 
+
 // Function Maker
 class WCFunctionMaker {
     constructor(name, func) {
@@ -2571,6 +2584,7 @@ Object.defineProperties(WillClient, {
     "Function": { value: WCFunctionMaker }, "function": { value: WCFunctionMaker },
     "Func": { value: WCFunctionMaker }, "func": { value: WCFunctionMaker}
 });
+
 
 
 // Property Maker
@@ -2595,6 +2609,7 @@ Object.defineProperties(WillClient, {
     "Property": { value: WCPropertyMaker }, "property": { value: WCPropertyMaker },
     "Prop": { value: WCPropertyMaker }, "prop": { value: WCPropertyMaker }
 });
+
 
 
 module.exports = { WillClient, Embed, ActionRow, Row, Button, Selection, SelectMenu, Stew, Soup, Noodle, random, WCFunctionMaker, WCPropertyMaker };
