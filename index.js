@@ -1,5 +1,5 @@
 /*
-	:: WillClient :: Version 1.0.0 | 08/31/23 ::
+	:: WillClient :: Version 1.0.0 | 09/03/23 ::
 	https://github.com/paigeroid/willclient
 
 */
@@ -1157,19 +1157,19 @@ class WillClient {
 			return this.cooldownHandles.push(func)
 		}
 		
-		this.client.on(eventName, (ctx) => {
+		this.client.on(eventName, function (/**/) {
 			if (eventName == "interactionCreate") {
 				if (ctx.isButton() && noodName.equalTo("button", "buttonPress", "buttonPressed") ) {
-					return func(ctx);
+					return func(...Array.from(arguments));
 				}
 				if (ctx.isStringSelectMenu() && noodName.equalTo("selection", "select", "selectMenu", "submitSelection", "submitSelectMenu", "selectSubmit", "selectMenuSubmit", "selectionSubmit") ) {
-					return func(ctx);
+					return func(...Array.from(arguments));
 				}
 				if (ctx.isChatInputCommand() && noodName.equalTo("commandRan", "command") ) {
-					return func(ctx);
+					return func(...Array.from(arguments));
 				}
 			}
-			return func(ctx);
+			return func(...Array.from(arguments));
 		});
     }
 	on(name, func) { return this.event(name, func); }
@@ -1177,46 +1177,60 @@ class WillClient {
 
 
 	commandAction(func) {
-		this.client.on("interactionCreate", (ctx) => {
+		this.client.on("interactionCreate", (/**/) => {
 			if (ctx.isChatInputCommand()) {
-				return func(ctx);
+				return func(...Array.from(arguments));
 			}
 		});
 	}
 	
 	
 	buttonAction(func) {
-		this.client.on("interactionCreate", (ctx) => {
+		this.client.on("interactionCreate", (/**/) => {
 			if (ctx.isButton()) {
-				return func(ctx);
+				return func(...Array.from(arguments));
 			}
 		});
 	}
 	
 	
 	selectionAction(func) {
-		this.client.on("interactionCreate", (ctx) => {
+		this.client.on("interactionCreate", (/**/) => {
 			if (ctx.isStringSelectMenu()) {
-				return func(ctx);
+				return func(...Array.from(arguments));
 			}
 		});
 	}
 
 
 	selectMenuAction(func) {
-		this.client.on("interactionCreate", (ctx) => {
+		this.client.on("interactionCreate", (/**/) => {
 			if (ctx.isStringSelectMenu()) {
-				return func(ctx);
+				return func(...Array.from(arguments));
 			}
 		});
 	}
 	
 	
 	rowAction(func) {
-		this.client.on("interactionCreate", (ctx) => {
+		this.client.on("interactionCreate", (/**/) => {
 			if (ctx.isButton() || ctx.isStringSelectMenu()) {
-				return func(ctx);
+				return func(...Array.from(arguments));
 			}
+		});
+	}
+
+
+	reaction(message, settings={ emoji:"🧍‍♂️", remove:false }, func) {
+		let emoji = (typeof settings == "string") ? settings : settings.emoji;
+		message.react(emoji);
+		
+		this.client.on("messageReactionAdd", async (ctx, user) => {
+			if (user.id == this.client.user.id) return
+
+			await func(ctx, user);
+
+			if (settings.remove) ctx.users.remove(user.id);
 		});
 	}
 
