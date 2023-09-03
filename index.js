@@ -1223,10 +1223,15 @@ class WillClient {
 
 	reaction(message, settings={ emoji:"🧍‍♂️", remove:false }, func) {
 		let emoji = (typeof settings == "string") ? settings : settings.emoji;
+		
 		message.react(emoji);
 		
 		this.client.on("messageReactionAdd", async (ctx, user) => {
-			if (user.id == this.client.user.id) return
+			if (
+				user.id == this.client.user.id || 
+				ctx.message.id != message.id || 
+				ctx._emoji.name != emoji
+			) return
 
 			await func(ctx, user);
 
