@@ -1180,12 +1180,14 @@ class WillClient {
 		this.client.on("interactionCreate", (/**/) => {
 			var ctx = Array.from(arguments)[0]
 			if (ctx.isChatInputCommand()) {
-				
 				if (typeof func == "string" && ctx.commandName == func && func2) {
 					return func2(...Array.from(arguments));
 				}
-				else {
+				else if (typeof func == "function") {
 					return func(...Array.from(arguments));
+				}
+				else {
+					return
 				}
 			}
 		});
@@ -1196,12 +1198,14 @@ class WillClient {
 		this.client.on("interactionCreate", (/**/) => {
 			var ctx = Array.from(arguments)[0]
 			if (ctx.isButton()) {
-				
 				if (typeof func == "string" && ctx.customId == func && func2) {
 					return func2(...Array.from(arguments));
 				}
-				else {
+				else if (typeof func == "function") {
 					return func(...Array.from(arguments));
+				}
+				else {
+					return
 				}
 			}
 		});
@@ -1215,8 +1219,11 @@ class WillClient {
 				if (typeof func == "string" && ctx.customId == func && func2) {
 					return func2(...Array.from(arguments));
 				}
-				else {
+				else if (typeof func == "function") {
 					return func(...Array.from(arguments));
+				}
+				else {
+					return
 				}
 			}
 		});
@@ -1230,8 +1237,11 @@ class WillClient {
 				if (typeof func == "string" && ctx.customId == func && func2) {
 					return func2(...Array.from(arguments));
 				}
-				else {
+				else if (typeof func == "function") {
 					return func(...Array.from(arguments));
+				}
+				else {
+					return
 				}
 			}
 		});
@@ -1245,8 +1255,11 @@ class WillClient {
 				if (typeof func == "string" && ctx.customId == func && func2) {
 					return func2(...Array.from(arguments));
 				}
-				else {
+				else if (typeof func == "function") {
 					return func(...Array.from(arguments));
+				}
+				else {
+					return
 				}
 			}
 		});
