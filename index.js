@@ -1177,17 +1177,13 @@ class WillClient {
 
 
 	commandAction(func, func2=null) {
-		this.client.on("interactionCreate", (/**/) => {
-			var ctx = Array.from(arguments)[0]
+		this.client.on("interactionCreate", async function (ctx) {
 			if (ctx.isChatInputCommand()) {
 				if (typeof func == "string" && ctx.commandName == func && func2) {
-					return func2(...Array.from(arguments));
+					return await func2(...Array.from(arguments));
 				}
 				else if (typeof func == "function") {
-					return func(...Array.from(arguments));
-				}
-				else {
-					return
+					return await func(...Array.from(arguments));
 				}
 			}
 		});
@@ -1195,17 +1191,13 @@ class WillClient {
 	
 	
 	buttonAction(func, func2=null) {
-		this.client.on("interactionCreate", (/**/) => {
-			var ctx = Array.from(arguments)[0]
+		this.client.on("interactionCreate", async function (ctx) {
 			if (ctx.isButton()) {
 				if (typeof func == "string" && ctx.customId == func && func2) {
-					return func2(...Array.from(arguments));
+					return await func2(...Array.from(arguments));
 				}
 				else if (typeof func == "function") {
-					return func(...Array.from(arguments));
-				}
-				else {
-					return
+					return await func(...Array.from(arguments));
 				}
 			}
 		});
@@ -1213,17 +1205,13 @@ class WillClient {
 	
 	
 	selectionAction(func, func2=null) {
-		this.client.on("interactionCreate", (/**/) => {
-			var ctx = Array.from(arguments)[0]
+		this.client.on("interactionCreate", async function (ctx) {
 			if (ctx.isStringSelectMenu()) {
 				if (typeof func == "string" && ctx.customId == func && func2) {
-					return func2(...Array.from(arguments));
+					return await func2(...Array.from(arguments));
 				}
 				else if (typeof func == "function") {
-					return func(...Array.from(arguments));
-				}
-				else {
-					return
+					return await func(...Array.from(arguments));
 				}
 			}
 		});
@@ -1231,17 +1219,13 @@ class WillClient {
 
 
 	selectMenuAction(func, func2=null) {
-		this.client.on("interactionCreate", (/**/) => {
-			var ctx = Array.from(arguments)[0]
+		this.client.on("interactionCreate", async function (ctx) {
 			if (ctx.isStringSelectMenu()) {
 				if (typeof func == "string" && ctx.customId == func && func2) {
-					return func2(...Array.from(arguments));
+					return await func2(...Array.from(arguments));
 				}
 				else if (typeof func == "function") {
-					return func(...Array.from(arguments));
-				}
-				else {
-					return
+					return await func(...Array.from(arguments));
 				}
 			}
 		});
@@ -1249,17 +1233,13 @@ class WillClient {
 	
 	
 	rowAction(func, func2=null) {
-		this.client.on("interactionCreate", (/**/) => {
-			var ctx = Array.from(arguments)[0]
+		this.client.on("interactionCreate", async function (ctx) {
 			if (ctx.isButton() || ctx.isStringSelectMenu()) {
 				if (typeof func == "string" && ctx.customId == func && func2) {
-					return func2(...Array.from(arguments));
+					return await func2(...Array.from(arguments));
 				}
 				else if (typeof func == "function") {
-					return func(...Array.from(arguments));
-				}
-				else {
-					return
+					return await func(...Array.from(arguments));
 				}
 			}
 		});
