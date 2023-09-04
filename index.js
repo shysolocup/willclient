@@ -1176,46 +1176,78 @@ class WillClient {
 	action(name, func) { return this.event(name, func); }
 
 
-	commandAction(func) {
+	commandAction(func, func2=null) {
 		this.client.on("interactionCreate", (/**/) => {
+			var ctx = Array.from(arguments)[0]
 			if (ctx.isChatInputCommand()) {
-				return func(...Array.from(arguments));
+				
+				if (typeof func == "string" && ctx.commandName == func && func2) {
+					return func2(...Array.from(arguments));
+				}
+				else {
+					return func(...Array.from(arguments));
+				}
 			}
 		});
 	}
 	
 	
-	buttonAction(func) {
+	buttonAction(func, func2=null) {
 		this.client.on("interactionCreate", (/**/) => {
+			var ctx = Array.from(arguments)[0]
 			if (ctx.isButton()) {
-				return func(...Array.from(arguments));
+				
+				if (typeof func == "string" && ctx.customId == func && func2) {
+					return func2(...Array.from(arguments));
+				}
+				else {
+					return func(...Array.from(arguments));
+				}
 			}
 		});
 	}
 	
 	
-	selectionAction(func) {
+	selectionAction(func, func2=null) {
 		this.client.on("interactionCreate", (/**/) => {
+			var ctx = Array.from(arguments)[0]
 			if (ctx.isStringSelectMenu()) {
-				return func(...Array.from(arguments));
+				if (typeof func == "string" && ctx.customId == func && func2) {
+					return func2(...Array.from(arguments));
+				}
+				else {
+					return func(...Array.from(arguments));
+				}
 			}
 		});
 	}
 
 
-	selectMenuAction(func) {
+	selectMenuAction(func, func2=null) {
 		this.client.on("interactionCreate", (/**/) => {
+			var ctx = Array.from(arguments)[0]
 			if (ctx.isStringSelectMenu()) {
-				return func(...Array.from(arguments));
+				if (typeof func == "string" && ctx.customId == func && func2) {
+					return func2(...Array.from(arguments));
+				}
+				else {
+					return func(...Array.from(arguments));
+				}
 			}
 		});
 	}
 	
 	
-	rowAction(func) {
+	rowAction(func, func2=null) {
 		this.client.on("interactionCreate", (/**/) => {
+			var ctx = Array.from(arguments)[0]
 			if (ctx.isButton() || ctx.isStringSelectMenu()) {
-				return func(...Array.from(arguments));
+				if (typeof func == "string" && ctx.customId == func && func2) {
+					return func2(...Array.from(arguments));
+				}
+				else {
+					return func(...Array.from(arguments));
+				}
 			}
 		});
 	}
