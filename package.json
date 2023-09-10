@@ -1,6 +1,6 @@
 {
     "name": "willclient",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "paigeroid",
     "description": "Custom Discord API mod made in Node.JS that combines elements from Discord.PY and Discord.JS",
     "dependencies": {
