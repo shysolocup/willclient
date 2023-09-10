@@ -1,5 +1,5 @@
 /*
-	:: WillClient :: Version 1.0.0 | 09/03/23 ::
+	:: WillClient :: Version 1.0.1 | 09/10/23 ::
 	https://github.com/paigeroid/willclient
 
 */
