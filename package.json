@@ -21,10 +21,12 @@
         "url": "https://github.com/paigeroid/willclient/blob/main/LICENSE"
     },
     "keywords": [
+        "discord",
         "discord.js",
         "discord.py",
         "willclient",
-        "discord"
+        "discord",
+        "stews"
     ],
     "homepage": "https://github.com/paigeroid/willclient",
     "main": "./index.js"
