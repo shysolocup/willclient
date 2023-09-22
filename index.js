@@ -156,9 +156,7 @@ class WillClient {
 			} catch(e) {
 				try {
 					return require(path); 
-				} catch(e) {
-					throw new CoolError("Plugins", `Invalid plugin path: ${path}`);
-				}
+				} catch(e) { return; }
 			}
 		}) {
 
