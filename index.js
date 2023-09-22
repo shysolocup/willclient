@@ -154,9 +154,7 @@ class WillClient {
 			try {
 				return require(`../../${path}`); 
 			} catch(e) {
-				try {
-					return require(path); 
-				} catch(e) { return; }
+				return require(path); 
 			}
 		}) {
 
